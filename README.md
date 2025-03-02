@@ -25,8 +25,7 @@ There is a chat application built with Streamlit that integrates with ChatOllama
 
 ### Prerequisites
 
-- Python 3.9 or higher
-- [Ollama](https://ollama.com/) installed and configured.
+- Docker engine installed.
 
 ### Installation
 
@@ -39,23 +38,15 @@ Follow these steps to install and run the project:
  cd masaryk-university-master-thesis
  ```
    
-2. **(Optional) Create a python env:**
+2. **Run docker-compose**
  
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+docker-compose up --build
 ```
-3. **Install dependencies:**
+3. **Go to localhost:8501**
 
-```bash
-pip install -r requirements.txt
-```
+[localhost:8501](localhost:8501)
 
-4. **Run the app using Streamlit:**
-
-```bash
-streamlit chat-screen.py
-```
 
 ## Author
 - Ecenur Sezer

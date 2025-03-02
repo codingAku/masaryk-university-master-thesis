@@ -12,10 +12,9 @@ from langchain_core.prompts import (
 from streamlit_chat import message  # new chat UI component
 from streamlit.components.v1 import html
 
-# Set page config as the very first Streamlit command
 st.set_page_config(layout="wide", page_title="Eliciation meeting")
 
-# Add margin between buttons without increasing font size and add padding between radio options
+# add padding between radio options
 st.markdown(
     """
     <style>
@@ -43,10 +42,10 @@ def get_available_models():
             # Skip empty lines and headers (adjust this logic as needed)
             if line.strip() and not line.startswith("NAME"):
                 models.append(line.strip().split()[0])
-        return models if models else ["llama3.1:8b"]
+        return models if models else ["llama3.1:latest"]
     except Exception as e:
         # In case of any error, fallback to a default model.
-        return ["llama3.1:8b"]
+        return ["llama3.1:latest"]
 
 # -----------------------------
 # 2. Session State Setup
@@ -58,11 +57,11 @@ if "persona" not in st.session_state:
 if "input_counter" not in st.session_state:
     st.session_state["input_counter"] = 0
 if "selected_model" not in st.session_state:
-    st.session_state["selected_model"] = "llama3.1:8b"
+    st.session_state["selected_model"] = "llama3.1:latest"
 if "model" not in st.session_state:
     st.session_state["model"] = ChatOllama(model=st.session_state["selected_model"])
 
-# Define mock users for selection
+# Define mock users
 mock_users = {
     "John Doe": {"name": "John Doe", "job": "Software Engineer"},
     "Jane Smith": {"name": "Jane Smith", "job": "Data Scientist"},
@@ -88,7 +87,6 @@ def build_prompt_messages():
     return ChatPromptTemplate.from_messages(prompt_msgs)
 
 def generate_response(user_text):
-    """Generate a response from ChatOllama using Langchain."""
     chat_prompt = build_prompt_messages()
     new_user_msg = HumanMessagePromptTemplate.from_template(user_text)
     chat_prompt.messages.append(new_user_msg)
@@ -131,7 +129,7 @@ def update_model():
 # Two columns: left (persona info, photo, and user selection) and right (chat area)
 left_col, right_col = st.columns([2, 5], gap="medium")
 
-# -- LEFT COLUMN: Persona, Photo & User Selection --
+# LEFT COLUMN
 with left_col:
     # Horizontal layout: photo to the left, name and title to the right.
     photo_col, text_col = st.columns([1, 2])
@@ -146,7 +144,7 @@ with left_col:
     # User selection via radio buttons with on_change to update user info and clear chat
     st.radio("Select User:", options=list(mock_users.keys()), key="user_choice", on_change=update_user)
 
-# -- RIGHT COLUMN: Chat Interface with Model Selection Dropdown --
+# RIGHT COLUMN
 with right_col:
     # Dropdown for model selection at the top right.
     available_models = get_available_models()
@@ -154,7 +152,7 @@ with right_col:
     
     st.button("Delete Chat", on_click=delete_chat, help="Clears the entire chat.")
     
-    # Chat messages container (without a placeholder title or duplicate header)
+    # Chat messages container
     chat_placeholder = st.empty()
     with chat_placeholder.container():
         if st.session_state["chat_history"]:
