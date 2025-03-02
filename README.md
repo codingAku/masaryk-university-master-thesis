@@ -43,9 +43,9 @@ Follow these steps to install and run the project:
 ```bash
 docker-compose up --build
 ```
-3. **Go to localhost:8501**
+3. **Go to application port**
 
-[localhost:8501](localhost:8501)
+  [Stakebot](http://localhost:8501)
 
 
 ## Author
