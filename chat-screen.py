@@ -12,7 +12,7 @@ from langchain_core.prompts import (
 from streamlit_chat import message  # new chat UI component
 from streamlit.components.v1 import html
 
-st.set_page_config(layout="wide", page_title="Eliciation meeting")
+st.set_page_config(layout="wide", page_title="STAKEBOT")
 
 # add padding between radio options
 st.markdown(
