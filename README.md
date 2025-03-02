@@ -1,5 +1,61 @@
 # Master's Thesis Research - Masaryk University.
 Master's thesis research for Masaryk University, 2024. Mainly aiming for the development of an educational tool on requirement elicitation.
 
+# Stakebot 
+
+There is a chat application built with Streamlit that integrates with ChatOllama (via LangChain) and provides a modern chat UI. It includes features such as model selection via a dropdown, user profile management, and dynamic chat history clearing.
+![image](https://github.com/user-attachments/assets/6b85f18a-8daf-404f-9bc3-9aa1fe0f4537)
+
+
+## Features
+
+- **Dynamic Chat Interface:**  
+  Uses `streamlit-chat` to display chat messages.
+  
+- **User Profile Management:**  
+  Select a user from a set of mock profiles to update the persona information displayed on the app.
+
+- **Model Selection:**  
+  A dropdown in the top-right allows you to select the model. The app attempts to fetch available models using the `ollama list` command.
+
+- **Chat History Management:**  
+  Clear the chat history with a button and update it when the user or model is changed.
+
+## Setup
+
+### Prerequisites
+
+- Python 3.9 or higher
+- [Ollama](https://ollama.com/) installed and configured.
+
+### Installation
+
+Follow these steps to install and run the project:
+
+1. **Clone the repository and navigate to it:**
+
+ ```bash
+ git clone https://github.com/codingAku/masaryk-university-master-thesis
+ cd masaryk-university-master-thesis
+ ```
+   
+2. **(Optional) Create a python env:**
+ 
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+3. **Install dependencies:**
+
+```bash
+pip install -r requirements.txt
+```
+
+4. **Run the app using Streamlit:**
+
+```bash
+streamlit chat-screen.py
+```
+
 ## Author
 - Ecenur Sezer
