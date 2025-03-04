@@ -14,6 +14,13 @@ services:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/mydb
     depends_on:
       - db
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   db:
     image: postgres:13
