@@ -20,24 +20,32 @@ class Person(Base):
     english_level = Column(String)
     personality_traits = Column(Text)
     profile_photo = Column(LargeBinary)
-    transcript_files = Column(LargeBinary)
-    # Relationship to chat history
+    transcript_files = relationship("Transcript", back_populates="person", cascade="all, delete-orphan")
     chat_history = relationship("ChatHistory", back_populates="person", cascade="all, delete-orphan")
 
 class ChatHistory(Base):
     __tablename__ = "chat_history"
     id = Column(Integer, primary_key=True, index=True)
     person_id = Column(Integer, ForeignKey("person.id"), nullable=False)
-    role = Column(String, nullable=False)  # "user" or "assistant"
+    role = Column(String, nullable=False)
     message = Column(Text, nullable=False)
     timestamp = Column(DateTime(timezone=True), server_default=func.now())
     
     person = relationship("Person", back_populates="chat_history")
 
+class Transcript(Base):
+    __tablename__ = "transcript"
+    id = Column(Integer, primary_key=True, index=True)
+    person_id = Column(Integer, ForeignKey("person.id"), nullable=False)
+    file_name = Column(String, nullable=False)
+    file_content = Column(LargeBinary, nullable=False)
+    
+    person = relationship("Person", back_populates="transcript_files")
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 
-def add_user(first_name, last_name, job_title, native_language, english_level, personality_traits, profile_photo_bytes, transcript_bytes):
+def add_user(first_name, last_name, job_title, native_language, english_level, personality_traits, profile_photo_bytes, transcript_files):
     db = SessionLocal()
     new_person = Person(
         first_name=first_name,
@@ -47,11 +55,16 @@ def add_user(first_name, last_name, job_title, native_language, english_level, p
         english_level=english_level,
         personality_traits=personality_traits,
         profile_photo=profile_photo_bytes,
-        transcript_files=transcript_bytes,
     )
     db.add(new_person)
     db.commit()
     db.refresh(new_person)
+    
+    for file_name, file_content in transcript_files:
+        transcript = Transcript(person_id=new_person.id, file_name=file_name, file_content=file_content)
+        db.add(transcript)
+    
+    db.commit()
     db.close()
     return new_person
 
@@ -62,9 +75,14 @@ def get_users():
     return [
         {
             "id": user.id,
-            "name": f"{user.first_name} {user.last_name}",
-            "job": user.job_title,
-            "profile_photo": user.profile_photo
+            "first_name": user.first_name,
+            "last_name":user.last_name,
+            "job_title": user.job_title,
+            "profile_photo": user.profile_photo,
+            "native_language": user.native_language,
+            "english_level":user.english_level,
+            "personality_traits":user.personality_traits,
+            
         }
         for user in users
     ]
@@ -82,12 +100,10 @@ def get_chat_history(person_id):
     db = SessionLocal()
     history = db.query(ChatHistory).filter(ChatHistory.person_id == person_id).order_by(ChatHistory.timestamp).all()
     db.close()
-    # Group the messages into exchanges. We assume each user message is followed by an assistant reply.
     exchanges = []
     current_exchange = {}
     for h in history:
         if h.role == "user":
-            # If a previous exchange exists without an assistant reply, add it.
             if current_exchange:
                 exchanges.append(current_exchange)
             current_exchange = {"user": h.message, "assistant": ""}
@@ -97,12 +113,40 @@ def get_chat_history(person_id):
                 exchanges.append(current_exchange)
                 current_exchange = {}
             else:
-                # In case of an orphan assistant message.
                 exchanges.append({"user": "", "assistant": h.message})
-    # If an exchange is incomplete, add it as well.
     if current_exchange:
         exchanges.append(current_exchange)
     return exchanges
 
-# Initialize the database tables on module import.
+def delete_chat_history(person_id):
+    db = SessionLocal()
+    db.query(ChatHistory).filter(ChatHistory.person_id == person_id).delete()
+    db.commit()
+    db.close()
+
+def update_user(user_id, first_name, last_name, job_title, native_language, english_level, personality_traits, profile_photo_bytes, transcript_files):
+    db = SessionLocal()
+    user = db.query(Person).filter(Person.id == user_id).first()
+    if user:
+        user.first_name = first_name
+        user.last_name = last_name
+        user.job_title = job_title
+        user.native_language = native_language
+        user.english_level = english_level
+        user.personality_traits = personality_traits
+        if profile_photo_bytes:
+            user.profile_photo = profile_photo_bytes
+        db.query(Transcript).filter(Transcript.person_id == user_id).delete()
+        for file_name, file_content in transcript_files:
+            transcript = Transcript(person_id=user.id, file_name=file_name, file_content=file_content)
+            db.add(transcript)
+        db.commit()
+    db.close()
+
+def delete_user(user_id):
+    db = SessionLocal()
+    db.query(Person).filter(Person.id == user_id).delete()
+    db.commit()
+    db.close()
+
 init_db()

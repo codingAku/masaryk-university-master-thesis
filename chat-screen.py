@@ -11,7 +11,7 @@ from langchain_core.prompts import (
     AIMessagePromptTemplate,
     ChatPromptTemplate,
 )
-from streamlit_chat import message  # new chat UI component
+from streamlit_chat import message
 from streamlit.components.v1 import html
 
 # Import our database helper functions from db.py
@@ -30,7 +30,10 @@ st.markdown(
         margin-bottom: 10px;
     }
     </style>
-    """, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True,
+)
+
 
 # -----------------------------
 # 1. Get available models via ollama list command.
@@ -45,6 +48,7 @@ def get_available_models():
         return models if models else ["llama3.1:latest"]
     except Exception as e:
         return ["llama3.1:latest"]
+
 
 # -----------------------------
 # 2. Session State Setup
@@ -64,6 +68,8 @@ if "show_add_user_form" not in st.session_state:
 if "user_choice" not in st.session_state:
     # Initially set to placeholder so no user is selected.
     st.session_state["user_choice"] = "-- Select a User --"
+if "update_mode" not in st.session_state:
+    st.session_state["update_mode"] = False
 
 # -----------------------------
 # 3. Helper Functions for Chat
@@ -71,6 +77,7 @@ if "user_choice" not in st.session_state:
 system_message = SystemMessagePromptTemplate.from_template(
     "You are {persona_name}, a helpful AI with the job title: {persona_job}. Respond concisely."
 )
+
 
 def build_prompt_messages():
     persona_name = st.session_state["persona"].get("name", "User")
@@ -82,6 +89,7 @@ def build_prompt_messages():
         prompt_msgs.append(AIMessagePromptTemplate.from_template(entry["assistant"]))
     return ChatPromptTemplate.from_messages(prompt_msgs)
 
+
 def generate_response(user_text):
     chat_prompt = build_prompt_messages()
     new_user_msg = HumanMessagePromptTemplate.from_template(user_text)
@@ -89,6 +97,7 @@ def generate_response(user_text):
     chain = chat_prompt | st.session_state["model"] | StrOutputParser()
     response = chain.invoke({})
     return response
+
 
 def process_message(user_text):
     if not user_text.strip():
@@ -104,24 +113,34 @@ def process_message(user_text):
     db.add_chat_message(person_id, "assistant", response_text)
     st.session_state["chat_history"] = db.get_chat_history(person_id)
 
+
 def on_text_submit():
     user_text = st.session_state.get("user_input")
     process_message(user_text)
     st.session_state["input_counter"] += 1
     st.session_state["user_input"] = ""  # Clear text input
 
+
 def delete_chat():
+    if st.session_state["persona"].get("id"):
+        db.delete_chat_history(st.session_state["persona"]["id"])
     st.session_state["chat_history"] = []
-    #TODO: delete from db.
+
 
 def update_model():
     st.session_state["model"] = ChatOllama(model=st.session_state["selected_model"])
+
+
+def image_to_base64(image_bytes):
+    return f"data:image/png;base64,{base64.b64encode(image_bytes).decode()}"
+
 
 # -----------------------------
 # 4. Database Helper Functions for Users
 # -----------------------------
 def get_db_users():
     return db.get_users()
+
 
 def update_persona(new_persona):
     st.session_state["persona"] = new_persona
@@ -130,33 +149,76 @@ def update_persona(new_persona):
     else:
         st.session_state["chat_history"] = []
 
-def show_add_user():
-    st.session_state["show_add_user_form"] = True
 
-def submit_new_user():
-    first_name = st.session_state.get("first_name")
-    last_name = st.session_state.get("last_name")
-    job_title = st.session_state.get("job_title")
-    native_language = st.session_state.get("native_language")
-    english_level = st.session_state.get("english_level")
-    personality_traits = st.session_state.get("personality_traits")
-    profile_photo_file = st.session_state.get("profile_photo")
-    transcript_file = st.session_state.get("transcript_file")
-    profile_photo_bytes = profile_photo_file.read() if profile_photo_file is not None else None
-    transcript_bytes = transcript_file.read() if transcript_file is not None else None
-    new_person = db.add_user(first_name, last_name, job_title, native_language, english_level, personality_traits, profile_photo_bytes, transcript_bytes)
-    st.success("New user added successfully!")
-    new_user = {
-        "id": new_person.id,
-        "name": f"{first_name} {last_name}",
-        "job": job_title,
-        "profile_photo": new_person.profile_photo
-        #TODO: add other fields
-    }
+def update_user():
+    st.session_state["show_add_user_form"] = True
+    st.session_state["update_mode"] = True
+
+
+def cancel_user_update():
+    st.session_state["show_add_user_form"] = False
+    st.session_state["update_mode"] = False
+    st.session_state["user_choice"] = f"{st.session_state["persona"]["first_name"]} {st.session_state["persona"]["last_name"]}"
+
+
+def delete_user():
+    if st.session_state["persona"].get("id"):
+        db.delete_chat_history(st.session_state["persona"]["id"])
+        db.delete_user(st.session_state["persona"]["id"])
+    st.session_state["persona"] = {}
+    st.session_state["chat_history"] = []
     st.session_state["show_add_user_form"] = False
 
-def image_to_base64(image_bytes):
-    return f"data:image/png;base64,{base64.b64encode(image_bytes).decode()}"
+
+def submit_new_user():
+    first_name = st.session_state.get("first_name", "")
+    last_name = st.session_state.get("last_name", "")
+    job_title = st.session_state.get("job_title", "")
+    native_language = st.session_state.get("native_language", "")
+    english_level = st.session_state.get("english_level", "")
+    personality_traits = st.session_state.get("personality_traits", "")
+    profile_photo_file = st.session_state.get("profile_photo")
+    transcript_files = st.session_state.get("transcript_files", [])
+
+    transcript_data = (
+        [(file.name, file.read()) for file in transcript_files]
+        if transcript_files
+        else []
+    )
+    profile_photo_bytes = profile_photo_file.read() if profile_photo_file else None
+    
+    if st.session_state.get("update_mode", False) and "persona" in st.session_state:
+        db.update_user(
+            st.session_state["persona"].get("id"),
+            first_name,
+            last_name,
+            job_title,
+            native_language,
+            english_level,
+            personality_traits,
+            profile_photo_bytes,
+            transcript_data,
+        )
+    else:
+        db.add_user(
+            first_name,
+            last_name,
+            job_title,
+            native_language,
+            english_level,
+            personality_traits,
+            profile_photo_bytes,
+            transcript_data,
+        )
+
+    st.success("User saved successfully!")
+    st.session_state["show_add_user_form"] = False
+    st.session_state["persona"] = {}
+    st.session_state["chat_history"] = []
+
+def show_add_user():
+    st.session_state["show_add_user_form"] = True
+    st.session_state["update_mode"] = False
 
 # -----------------------------
 # 5. UI Layout
@@ -166,18 +228,88 @@ left_col, right_col = st.columns([2, 5], gap="medium")
 
 # LEFT COLUMN: User management.
 with left_col:
-    if st.session_state["show_add_user_form"]:
-        st.header("Add New User")
-        with st.form("add_user_form"):
-            st.text_input("First Name:", key="first_name")
-            st.text_input("Last Name:", key="last_name")
-            st.text_input("Job Title:", key="job_title")
-            st.text_input("Native Language:", key="native_language")
-            st.text_input("English Level:", key="english_level")
-            st.text_area("Personality Traits:", key="personality_traits")
-            st.file_uploader("Upload a Profile Photo:", key="profile_photo", type=["png", "jpg", "jpeg"])
-            st.file_uploader("Upload Transcript (txt):", key="transcript_file", type=["txt"])
-            st.form_submit_button("Save", on_click=submit_new_user)
+    if st.session_state.get("show_add_user_form", False):
+        st.header("Update/Add User")
+        form = st.form("add_user_form")
+
+        form.text_input(
+            "First Name:",
+            key="first_name",
+            value=(
+                st.session_state.get("persona", {}).get("first_name", "")
+                if st.session_state.get("update_mode", False)
+                else ""
+            ),
+        )
+
+        form.text_input(
+            "Last Name:",
+            key="last_name",
+            value=(
+                st.session_state.get("persona", {}).get("last_name", "")
+                if st.session_state.get("update_mode", False)
+                else ""
+            ),
+        )
+
+        form.text_input(
+            "Job Title:",
+            key="job_title",
+            value=(
+                st.session_state.get("persona", {}).get("job_title", "")
+                if st.session_state.get("update_mode", False)
+                else ""
+            ),
+        )
+
+        form.text_input(
+            "Native Language:",
+            key="native_language",
+            value=(
+                st.session_state.get("persona", {}).get("native_language", "")
+                if st.session_state.get("update_mode", False)
+                else ""
+            ),
+        )
+
+        form.text_input(
+            "English Level:",
+            key="english_level",
+            value=(
+                st.session_state.get("persona", {}).get("english_level", "")
+                if st.session_state.get("update_mode", False)
+                else ""
+            ),
+        )
+
+        form.text_area(
+            "Personality Traits:",
+            key="personality_traits",
+            value=(
+                st.session_state.get("persona", {}).get("personality_traits", "")
+                if st.session_state.get("update_mode", False)
+                else ""
+            ),
+        )
+
+        form.file_uploader(
+            "Upload Profile Photo:",
+            key="profile_photo",
+            type=["png", "jpg", "jpeg"]
+        )
+
+        form.file_uploader(
+            "Upload Transcripts:",
+            key="transcript_files",
+            type=["txt"],
+            accept_multiple_files=True,
+        )
+
+        form.form_submit_button("Save", on_click=submit_new_user)
+        form.form_submit_button("Cancel", on_click=cancel_user_update)
+
+        if st.session_state.get("update_mode", False):
+            form.form_submit_button("Delete User", on_click=delete_user)
     else:
         if st.session_state["persona"]:
             # Display user info from DB, including profile photo if available.
@@ -187,68 +319,90 @@ with left_col:
                 if profile_photo:
                     try:
                         # Convert bytes to an image
-                        image = Image.open(io.BytesIO(profile_photo))
+                        img_base64 = base64.b64encode(profile_photo).decode()
 
-                        # Display image as a circle using Streamlit
                         st.markdown(
-                            """
+                            f"""
                             <style>
-                            .circle-img {
-                                border-radius: 100%;
-                                width: 100px;
-                                height: 100px;
-                                object-fit: cover;
-                                display: block;
-                                margin: auto;
-                            }
+                                .circle-img {{
+                                    border-radius: 50%;
+                                    width: 100px;
+                                    height: 100px;
+                                    object-fit: cover;
+                                    display: block;
+                                    margin: auto;
+                                }}
                             </style>
+                            <img src="data:image/png;base64,{img_base64}" class="circle-img">
                             """,
-                            unsafe_allow_html=True
+                            unsafe_allow_html=True,
                         )
-                        st.image(image, width=100)
                     except Exception as e:
                         st.error(f"Error loading image: {e}")
             with text_col:
-                st.header(st.session_state["persona"]["name"])
-                st.subheader(st.session_state["persona"]["job"])
+                st.header(f"{st.session_state["persona"]["first_name"]} {st.session_state["persona"]["last_name"]}")
+                st.subheader(st.session_state["persona"]["job_title"])
         else:
             st.info("No user selected. Please add a user.")
         st.markdown("---")
         # Load users from the database.
         db_users = get_db_users()
         if db_users:
-            user_options = {user["name"]: user for user in db_users}  # Map user names to user objects
+            user_options = {
+                f"{user["first_name"]} {user["last_name"]}": user for user in db_users
+            }  # Map user names to user objects
 
             # Ensure no default selection
             st.session_state.setdefault("user_choice", None)
 
             selected_user = st.selectbox(
                 "Select User:",
-                options=["-- Select a User --"] + list(user_options.keys()),  # Placeholder at the top
+                options=["-- Select a User --"]
+                + list(user_options.keys()),  # Placeholder at the top
                 index=0,  # Default to "-- Select a User --"
                 key="user_choice",
-                on_change=lambda: update_persona(user_options.get(st.session_state["user_choice"], {}))
+                on_change=lambda: update_persona(
+                    user_options.get(st.session_state["user_choice"], {})
+                ),
             )
         else:
             st.info("No users found. Please add a user.")
 
         st.button("Add User", on_click=show_add_user)
+        if st.session_state.get("persona"):
+            st.button("Update User", on_click=update_user)
 
-# RIGHT COLUMN: Chat interface.
 with right_col:
-    available_models = get_available_models()
-    st.selectbox("Select Model:", options=available_models, key="selected_model", on_change=update_model)
+    st.selectbox(
+        "Select Model:",
+        options=get_available_models(),
+        key="selected_model",
+        on_change=update_model,
+    )
     st.button("Delete Chat", on_click=delete_chat, help="Clears the entire chat.")
     chat_placeholder = st.empty()
     with chat_placeholder.container():
         if st.session_state["chat_history"]:
             for i, exchange in enumerate(st.session_state["chat_history"]):
-                message(exchange["user"], is_user=True, key=f"{i}_user", avatar_style="no-avatar")
+                message(
+                    exchange["user"],
+                    is_user=True,
+                    key=f"{i}_user",
+                    avatar_style="no-avatar",
+                )
                 if st.session_state["persona"].get("profile_photo"):
-                    logo_url = image_to_base64(st.session_state["persona"]["profile_photo"])
+                    logo_url = image_to_base64(
+                        st.session_state["persona"]["profile_photo"]
+                    )
                 else:
                     logo_url = None
-                message(exchange["assistant"], key=f"{i}", allow_html=True, logo=logo_url, avatar_style="no-avatar")
+                message(
+                    exchange["assistant"],
+                    key=f"{i}",
+                    allow_html=True,
+                    logo=logo_url,
+                    avatar_style="no-avatar",
+                )
         else:
             st.write("No messages yet. Start the conversation below.")
     if st.session_state["persona"].get("id"):
