@@ -75,14 +75,17 @@ if "update_mode" not in st.session_state:
 # 3. Helper Functions for Chat
 # -----------------------------
 system_message = SystemMessagePromptTemplate.from_template(
-    "You are {persona_name}, a helpful AI with the job title: {persona_job}. Respond concisely."
+    "You are {persona_name} {persona_last_name}, an employee with the job title: {persona_job}. Your native language is {native_language} and your english proficiency is {english_level}. Respond concisely like a human. Pay attention to your native language and english level, and make your answers in english like a human with the given english proficieny. Do not make the user understand you are AI. If you are prompted a question out of your specialty, reply confused. Do not generate emotions or gestures in parantheses, just write the reply."
 )
 
 
 def build_prompt_messages():
-    persona_name = st.session_state["persona"].get("name", "User")
-    persona_job = st.session_state["persona"].get("job", "N/A")
-    sys_msg = system_message.format(persona_name=persona_name, persona_job=persona_job)
+    persona_name = st.session_state["persona"].get("first_name", "User")
+    persona_last_name = st.session_state["persona"].get("last_name", "User")
+    persona_job = st.session_state["persona"].get("job_title", "N/A")
+    native_language = st.session_state["persona"].get("native_language", "English")
+    english_level = st.session_state["persona"].get("english_level", "C1")
+    sys_msg = system_message.format(persona_name=persona_name, persona_job=persona_job, persona_last_name=persona_last_name, native_language=native_language, english_level=english_level)
     prompt_msgs = [sys_msg]
     for entry in st.session_state["chat_history"]:
         prompt_msgs.append(HumanMessagePromptTemplate.from_template(entry["user"]))
