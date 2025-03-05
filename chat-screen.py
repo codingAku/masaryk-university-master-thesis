@@ -15,7 +15,28 @@ from streamlit_chat import message
 from streamlit.components.v1 import html
 
 # Import our database helper functions from db.py
-import db
+import db_helpers
+
+# Import helper modules
+from model_helpers import get_available_models
+from chat_helpers import (
+    build_prompt_messages,
+    generate_response,
+    process_message,
+    on_text_submit,
+    delete_chat,
+    update_model,
+    image_to_base64,
+)
+from user_helpers import (
+    get_db_users,
+    update_persona,
+    update_user,
+    cancel_user_update,
+    delete_user,
+    submit_new_user,
+    show_add_user,
+)
 
 st.set_page_config(layout="wide", page_title="STAKEBOT")
 
@@ -33,22 +54,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-
-# -----------------------------
-# 1. Get available models via ollama list command.
-# -----------------------------
-def get_available_models():
-    try:
-        output = subprocess.check_output(["ollama", "list"], universal_newlines=True)
-        models = []
-        for line in output.splitlines():
-            if line.strip() and not line.startswith("NAME"):
-                models.append(line.strip().split()[0])
-        return models if models else ["llama3.1:latest"]
-    except Exception as e:
-        return ["llama3.1:latest"]
-
 
 # -----------------------------
 # 2. Session State Setup
@@ -69,158 +74,6 @@ if "user_choice" not in st.session_state:
     # Initially set to placeholder so no user is selected.
     st.session_state["user_choice"] = "-- Select a User --"
 if "update_mode" not in st.session_state:
-    st.session_state["update_mode"] = False
-
-# -----------------------------
-# 3. Helper Functions for Chat
-# -----------------------------
-system_message = SystemMessagePromptTemplate.from_template(
-    "You are {persona_name} {persona_last_name}, an employee with the job title: {persona_job}. Your native language is {native_language} and your english proficiency is {english_level}. Respond concisely like a human. Pay attention to your native language and english level, and make your answers in english like a human with the given english proficieny. Do not make the user understand you are AI. If you are prompted a question out of your specialty, reply confused. Do not generate emotions or gestures in parantheses, just write the reply."
-)
-
-
-def build_prompt_messages():
-    persona_name = st.session_state["persona"].get("first_name", "User")
-    persona_last_name = st.session_state["persona"].get("last_name", "User")
-    persona_job = st.session_state["persona"].get("job_title", "N/A")
-    native_language = st.session_state["persona"].get("native_language", "English")
-    english_level = st.session_state["persona"].get("english_level", "C1")
-    sys_msg = system_message.format(persona_name=persona_name, persona_job=persona_job, persona_last_name=persona_last_name, native_language=native_language, english_level=english_level)
-    prompt_msgs = [sys_msg]
-    for entry in st.session_state["chat_history"]:
-        prompt_msgs.append(HumanMessagePromptTemplate.from_template(entry["user"]))
-        prompt_msgs.append(AIMessagePromptTemplate.from_template(entry["assistant"]))
-    return ChatPromptTemplate.from_messages(prompt_msgs)
-
-
-def generate_response(user_text):
-    chat_prompt = build_prompt_messages()
-    new_user_msg = HumanMessagePromptTemplate.from_template(user_text)
-    chat_prompt.messages.append(new_user_msg)
-    chain = chat_prompt | st.session_state["model"] | StrOutputParser()
-    response = chain.invoke({})
-    return response
-
-
-def process_message(user_text):
-    if not user_text.strip():
-        st.warning("Please enter a message before sending.")
-        return
-    if not st.session_state["persona"].get("id"):
-        st.warning("No user selected. Please add or select a user.")
-        return
-    response_text = generate_response(user_text)
-    person_id = st.session_state["persona"]["id"]
-    # Save both messages to the database.
-    db.add_chat_message(person_id, "user", user_text)
-    db.add_chat_message(person_id, "assistant", response_text)
-    st.session_state["chat_history"] = db.get_chat_history(person_id)
-
-
-def on_text_submit():
-    user_text = st.session_state.get("user_input")
-    process_message(user_text)
-    st.session_state["input_counter"] += 1
-    st.session_state["user_input"] = ""  # Clear text input
-
-
-def delete_chat():
-    if st.session_state["persona"].get("id"):
-        db.delete_chat_history(st.session_state["persona"]["id"])
-    st.session_state["chat_history"] = []
-
-
-def update_model():
-    st.session_state["model"] = ChatOllama(model=st.session_state["selected_model"])
-
-
-def image_to_base64(image_bytes):
-    return f"data:image/png;base64,{base64.b64encode(image_bytes).decode()}"
-
-
-# -----------------------------
-# 4. Database Helper Functions for Users
-# -----------------------------
-def get_db_users():
-    return db.get_users()
-
-
-def update_persona(new_persona):
-    st.session_state["persona"] = new_persona
-    if new_persona.get("id"):
-        st.session_state["chat_history"] = db.get_chat_history(new_persona["id"])
-    else:
-        st.session_state["chat_history"] = []
-
-
-def update_user():
-    st.session_state["show_add_user_form"] = True
-    st.session_state["update_mode"] = True
-
-
-def cancel_user_update():
-    st.session_state["show_add_user_form"] = False
-    st.session_state["update_mode"] = False
-    st.session_state["user_choice"] = f"{st.session_state["persona"]["first_name"]} {st.session_state["persona"]["last_name"]}"
-
-
-def delete_user():
-    if st.session_state["persona"].get("id"):
-        db.delete_chat_history(st.session_state["persona"]["id"])
-        db.delete_user(st.session_state["persona"]["id"])
-    st.session_state["persona"] = {}
-    st.session_state["chat_history"] = []
-    st.session_state["show_add_user_form"] = False
-
-
-def submit_new_user():
-    first_name = st.session_state.get("first_name", "")
-    last_name = st.session_state.get("last_name", "")
-    job_title = st.session_state.get("job_title", "")
-    native_language = st.session_state.get("native_language", "")
-    english_level = st.session_state.get("english_level", "")
-    personality_traits = st.session_state.get("personality_traits", "")
-    profile_photo_file = st.session_state.get("profile_photo")
-    transcript_files = st.session_state.get("transcript_files", [])
-
-    transcript_data = (
-        [(file.name, file.read()) for file in transcript_files]
-        if transcript_files
-        else []
-    )
-    profile_photo_bytes = profile_photo_file.read() if profile_photo_file else None
-    
-    if st.session_state.get("update_mode", False) and "persona" in st.session_state:
-        db.update_user(
-            st.session_state["persona"].get("id"),
-            first_name,
-            last_name,
-            job_title,
-            native_language,
-            english_level,
-            personality_traits,
-            profile_photo_bytes,
-            transcript_data,
-        )
-    else:
-        db.add_user(
-            first_name,
-            last_name,
-            job_title,
-            native_language,
-            english_level,
-            personality_traits,
-            profile_photo_bytes,
-            transcript_data,
-        )
-
-    st.success("User saved successfully!")
-    st.session_state["show_add_user_form"] = False
-    st.session_state["persona"] = {}
-    st.session_state["chat_history"] = []
-
-def show_add_user():
-    st.session_state["show_add_user_form"] = True
     st.session_state["update_mode"] = False
 
 # -----------------------------
@@ -343,7 +196,7 @@ with left_col:
                     except Exception as e:
                         st.error(f"Error loading image: {e}")
             with text_col:
-                st.header(f"{st.session_state["persona"]["first_name"]} {st.session_state["persona"]["last_name"]}")
+                st.header(f'{st.session_state["persona"]["first_name"]} {st.session_state["persona"]["last_name"]}')
                 st.subheader(st.session_state["persona"]["job_title"])
         else:
             st.info("No user selected. Please add a user.")
@@ -352,7 +205,7 @@ with left_col:
         db_users = get_db_users()
         if db_users:
             user_options = {
-                f"{user["first_name"]} {user["last_name"]}": user for user in db_users
+                f'{user["first_name"]} {user["last_name"]}': user for user in db_users
             }  # Map user names to user objects
 
             # Ensure no default selection
@@ -360,13 +213,10 @@ with left_col:
 
             selected_user = st.selectbox(
                 "Select User:",
-                options=["-- Select a User --"]
-                + list(user_options.keys()),  # Placeholder at the top
-                index=0,  # Default to "-- Select a User --"
+                options=["-- Select a User --"] + list(user_options.keys()),
+                index=0,
                 key="user_choice",
-                on_change=lambda: update_persona(
-                    user_options.get(st.session_state["user_choice"], {})
-                ),
+                on_change=lambda: update_persona(user_options.get(st.session_state["user_choice"], {})),
             )
         else:
             st.info("No users found. Please add a user.")
@@ -394,9 +244,7 @@ with right_col:
                     avatar_style="no-avatar",
                 )
                 if st.session_state["persona"].get("profile_photo"):
-                    logo_url = image_to_base64(
-                        st.session_state["persona"]["profile_photo"]
-                    )
+                    logo_url = image_to_base64(st.session_state["persona"]["profile_photo"])
                 else:
                     logo_url = None
                 message(
