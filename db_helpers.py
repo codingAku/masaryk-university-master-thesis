@@ -148,5 +148,45 @@ def delete_user(user_id):
     db.query(Person).filter(Person.id == user_id).delete()
     db.commit()
     db.close()
+    
+def get_user_transcripts(person_id):
+    """
+    Return a list of existing transcripts for the given user_id.
+    Each transcript is returned as a dict with filename and file_content.
+    """
+    db = SessionLocal()
+    transcripts = db.query(Transcript).filter(Transcript.person_id == person_id).all()
+    result = [
+        {
+            "filename": t.file_name,
+            "file_content": t.file_content
+        }
+        for t in transcripts
+    ]
+    db.close()
+    return result
+
+def remove_profile_photo(user_id):
+    """
+    Sets the user's profile_photo to None in the database.
+    """
+    db = SessionLocal()
+    user = db.query(Person).filter(Person.id == user_id).first()
+    if user:
+        user.profile_photo = None
+        db.commit()
+    db.close()
+
+def remove_transcript(user_id, transcript_filename):
+    """
+    Removes a specific transcript by filename for the given user_id.
+    """
+    db = SessionLocal()
+    db.query(Transcript).filter(
+        Transcript.person_id == user_id,
+        Transcript.file_name == transcript_filename
+    ).delete()
+    db.commit()
+    db.close()
 
 init_db()

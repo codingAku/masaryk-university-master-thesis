@@ -148,18 +148,56 @@ with left_col:
             ),
         )
 
+        # Existing file_uploader for new photo
         form.file_uploader(
             "Upload Profile Photo:",
             key="profile_photo",
             type=["png", "jpg", "jpeg"]
         )
 
+        # If an existing photo is in the DB, display it, plus a checkbox to remove
+        if st.session_state.get("persona", {}).get("profile_photo"):
+            try:
+                form.image(
+                    st.session_state["persona"]["profile_photo"],
+                    caption="Current Profile Picture",
+                    use_container_width=True
+                )
+            except Exception as e:
+                st.error(f"Error displaying current profile photo: {e}")
+
+            ### NEW CODE ###
+            # Checkbox to remove existing photo
+            form.checkbox(
+                "Remove the profile picture",
+                key="remove_profile_photo",
+                value=False
+            )
+
+        # Existing transcripts uploader
         form.file_uploader(
             "Upload Transcripts:",
             key="transcript_files",
             type=["txt"],
             accept_multiple_files=True,
         )
+
+        ### NEW CODE ###
+        # If transcripts are in persona, show them as a list with checkboxes
+        existing_transcripts = st.session_state["persona"].get("transcripts", [])
+        transcripts_to_remove = []
+        if existing_transcripts:
+            form.markdown("**Existing Transcripts:**")
+            for transcript in existing_transcripts:
+                # For clarity, assume each transcript is a dict with { "filename": "...", "content": ... } 
+                filename = transcript.get("filename")
+                # You can style or lay this out differently if you like:
+                remove = form.checkbox(f"Remove {filename}", key=f"remove_{filename}")
+                if remove:
+                    transcripts_to_remove.append(filename)
+
+        # Store the transcripts to remove in session state so we can process later
+        st.session_state["transcripts_to_remove"] = transcripts_to_remove
 
         form.form_submit_button("Save", on_click=submit_new_user)
         form.form_submit_button("Cancel", on_click=cancel_user_update)

@@ -11,8 +11,11 @@ def update_persona(new_persona):
     st.session_state["persona"] = new_persona
     if new_persona.get("id"):
         st.session_state["chat_history"] = db_helpers.get_chat_history(new_persona["id"])
+        # Also fetch transcripts and store in persona
+        st.session_state["persona"]["transcripts"] = db_helpers.get_user_transcripts(new_persona["id"])
     else:
         st.session_state["chat_history"] = []
+
 
 def update_user():
     st.session_state["show_add_user_form"] = True
@@ -49,6 +52,7 @@ def submit_new_user():
     profile_photo_bytes = profile_photo_file.read() if profile_photo_file else None
     
     if st.session_state.get("update_mode", False) and "persona" in st.session_state:
+        # Update user
         db_helpers.update_user(
             st.session_state["persona"].get("id"),
             first_name,
@@ -60,7 +64,19 @@ def submit_new_user():
             profile_photo_bytes,
             transcript_data,
         )
+
+        ### NEW CODE ###
+        # If the user checked "Remove current profile photo?"
+        if st.session_state.get("remove_profile_photo"):
+            db_helpers.remove_profile_photo(st.session_state["persona"].get("id"))
+
+        # If transcripts_to_remove is set, remove them from db_helpers
+        transcripts_to_remove = st.session_state.get("transcripts_to_remove", [])
+        for filename in transcripts_to_remove:
+            db_helpers.remove_transcript(st.session_state["persona"].get("id"), filename)
+
     else:
+        # Add new user
         db_helpers.add_user(
             first_name,
             last_name,
