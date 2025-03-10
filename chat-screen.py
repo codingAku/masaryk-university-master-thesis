@@ -181,8 +181,30 @@ with left_col:
             type=["txt"],
             accept_multiple_files=True,
         )
+        
+        # File uploader for audio file (wav and mp3) - only allow one
+        form.file_uploader(
+            "Upload Audio File:",
+            key="audio_files",
+            type=["wav", "mp3"],
+            accept_multiple_files=False,  # only one audio file allowed
+        )
+        
+        # If an existing audio file is in persona, display it and provide a checkbox to remove it
+        if st.session_state.get("persona", {}).get("audios"):
+            try:
+                # Assume only one audio file exists; fetch the first one.
+                existing_audio = st.session_state["persona"]["audios"][0]
+                form.audio(existing_audio["file_content"], format="audio/wav")
+            except Exception as e:
+                st.error(f"Error displaying current audio file: {e}")
 
-        ### NEW CODE ###
+            form.checkbox(
+                "Remove the audio file",
+                key="remove_audio_file",
+                value=False
+            )
+
         # If transcripts are in persona, show them as a list with checkboxes
         existing_transcripts = st.session_state["persona"].get("transcripts", [])
         transcripts_to_remove = []
@@ -191,7 +213,6 @@ with left_col:
             for transcript in existing_transcripts:
                 # For clarity, assume each transcript is a dict with { "filename": "...", "content": ... } 
                 filename = transcript.get("filename")
-                # You can style or lay this out differently if you like:
                 remove = form.checkbox(f"Remove {filename}", key=f"remove_{filename}")
                 if remove:
                     transcripts_to_remove.append(filename)
@@ -212,9 +233,7 @@ with left_col:
                 profile_photo = st.session_state["persona"].get("profile_photo")
                 if profile_photo:
                     try:
-                        # Convert bytes to an image
                         img_base64 = base64.b64encode(profile_photo).decode()
-
                         st.markdown(
                             f"""
                             <style>
