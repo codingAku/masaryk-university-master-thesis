@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://ollama.com/install.sh | bash
 
 # Start Ollama in the background and pull the models
-RUN ollama serve & sleep 3 && ollama pull llama3.1 && ollama pull deepseek-r1 && ollama pull gemma3:27b
+RUN ollama serve & sleep 3 && ollama pull llama3.1 && ollama pull deepseek-r1 && ollama pull gemma3:27b && ollama run gemma3:12b
 
 WORKDIR /app
 

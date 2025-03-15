@@ -2,44 +2,6 @@ MVR Rules Revision
 
 This document captures the updates needed for MVR rules in Toucan.
 
-BUSINESS REQUIREMENTS
-
-ID: MVR_OES.B.01
-Requirement: Manufacturing
-Priority: Must
-
-SAMPLE RULES (TOUC-2250 - Sample rules - import measurement DONE)
-
-ID: MVR_OES.SR.01
-Description: Remove sample column and sigma check from Curve check table
-Source: ASP team
-Priority: Must
-
-ID: MVR_OES.SR.02
-Description: Add warning: "1 quality has status Not OK: number of samples not matching with expected number" when importing incorrect number/name of samples (both QA and Calibrations)
-Source: ASP team
-Priority: Must
-
-SOLD-OUT SAMPLE MANAGEMENT (TOUC-2207 - In Progress)
-
-ID: MVR_OES.SSM.01
-Description: Do not update sample data when imported to the instrument
-Source: ASP team/MFG
-Priority: Must
-
-RULES REQUIREMENTS (TOUC-2437 - DONE)
-
-ID: MVR_OES.RR.01 - Additive interference
-ID: MVR_OES.RR.02 - Concavity
-ID: MVR_OES.RR.03 - Inflection
-ID: MVR_OES.RR.04 - Multiplication interference
-ID: MVR_OES.RR.05 - R²
-ID: MVR_OES.RR.06 - Root
-ID: MVR_OES.RR.07 - SEE
-ID: MVR_OES.RR.08 - Slope
-Source: ASP team
-Priority: Must
-
 Detailed Rules:
 
 ADDITIVE INTERFERENCE

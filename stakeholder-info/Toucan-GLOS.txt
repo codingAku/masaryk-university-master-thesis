@@ -1,597 +1,133 @@
-
-TABLE OF CONTENTS
-
-1	INTRODUCTION	3
-1.1	Purpose	3
-2	GLOSSARY	3
-3	DOMAIN MODELS	7
-3.1	Domain model of an OES Analysis	7
-3.2	Domain model of a calibration	7
-4	DOCUMENT INFO	8
-4.1	References	8
-4.2	Document Version History	8
-
-
-OPEN ISSUES
-Before approval of this document, all open Issues must be solved and this table must be removed. 
-If this is not possible, a Change Request must be submitted.
-
-ID
-Description
-Due date
-[dd Mmm yyyy]
-Owner 
-Change ID
-
-
-
-
-
-
-
-
-
-
-1 INTRODUCTION
-1.1 Purpose 
-The purpose of this document is to capture all relevant terms, and their relations, in the domain of Spectrometry and the Toucan project. This document can be referenced from any other document in the Toucan project.
-
-2 GLOSSARY
-Term
-Explanation (bold items refer to other Terms)
-2?, TwoTheta
-OI-xxxx : outcome of Position Scan?
-Analytical Assistant
-OI-xxxx
-AGC, Automatic Gain Control
-Compensates the energy loss of the signal at high count rate. This loss is increasing with the count rate. So the AGC enable to place maximum peak pulse distribution at more or less always the same mV. The AGC is adjusted to start to compensate from 10 KCps and this is electronically calculated during the HVCAL.
-
-In the energy profile parameter, we can select AGC ON or OFF. After an HVCAL, we run energy profile at 10 KCps with AGC = OFF to check is the maximum peak of the pulse distribution is OK = it means the HVCAL is properly programmed. 
-At high count rate, it is important to turn the AGC on.
-Analytical Condition
-Configuration of the Source (e.g. energy profile for spark Argon-flow) + duration of phases.
-Analytical Line
-Elements to be measured (wavelength, matrix, order, grating) and linked source conditions
-Analytical Method
-OI-xxxx
-Analytical Plan
-The Analytical Plan is the list of analytical lines required to meet the customer needs. It is based on the Optical plan.
-
-Describes what customer wants to measure, and in what priority (since trade-offs might be needed); the Optical Plan is a solution to this. The plan describes what lines need to be analysed, and which calibrations are needed for that.
-Example: Measure <Base Matrix> with <certain concentration range for element X> and <certain concentration range for element Y>.
-Analytical SW
-The software that controls the instrument (OXSAS) + any tools to test it (such as IOP-Procs)
-Angular resolution
-OI-xxxx
-Announcement
-A message to inform specific users of CARL/Toucan that a significant change has been made.
-Application
-Describes the required developments to do for each Matrix: all the required qualities, other specific applications such as Spark-DAT, extensions, etc.
-Argon
-Inert gas usually used to measure wavelengths <190nm.
-It is currently used to flush the spark-chamber (OES-only, both iSpark and easySpark) but can also be used to fulfil spectrometers.
-ARL
-Applied Research Laboratory, the old name of the Ecublens part of ThermoFisher.
-Article
-An optional to be ordered for an instrument, OI-xxxx
-Base
-Also called Matrix: it is the main element that constitutes  at least ~ 45-50% of the sample.
-BCC
-See Calculation Steps
-BCI
-See Calculation Steps
-BEA
-Bulk Element Analysis, a business unit within Thermo Fisher Scientific.
-BEC, Background Equivalent Concentration
-A quantitative measure of background level is called the Background Equivalent Concentration, or BEC, which is defined as the concentration of a given element that exhibits the same intensity as the background, measured at a given wavelength.
-
-See also DL.
-Bill-of-Material
-The list of parts needed to construct a new instrument to order.
-C#
-A modern programming language from Microsoft.
-Calculation Steps
-Calculations by OXSAS on the data from its sensors:
-* RII (0, Raw Intensity from Instrument): These are the intensities received from the instrument.
-* BCI (1, Raw Intensity after Overlap or Background Correction) : In the multivariable regression program, it is possible to make a regression of the analyte intensity versus the intensity of another line. The resulting equation is stored. This mathematics may be used equally for line overlaps or to correct background changes if the interfering line specified is a background line.
-* RNI (2, Intensity after Ratio (Normalization) with the Internal Standard(s)) : Calculate any ratio intensities needed.
-* SCI (3, Intensity after Standardization / Drift Correction) : Drift correction is made with either none, 1 or 2 samples per element as follows:
-o 1 sample, low value  Parallel shift correction only
-o 1 sample, high value  Rotational correction only
-o 2 samples, high and low  Parallel and rotational shift
-* OBI (4, Intensity after Overlap or Background Correction) : In the multivariable regression program, it is possible to make a regression of the analyte intensity versus the intensity of another line. The resulting equation is stored. This mathematics may be used equally for line overlaps or to correct background changes if the interfering line specified is a background line.
-* RCI (5, Intensity after Detector Response Curve Correction) : This response correction step is a mathematical tool allowing to convert intensities measured on the current instrument to intensities measured on an original one. This feature is usually not used in OES.
-* LS (6, Line Selection) : Several channels (spectral lines) can be defined for a single (chemical) element. Each of these channels is defined by intensity limits and a choice rank. At this stage, the program checks chronologically for which rank choice the intensity (or ratio) match with the given intensity limits. The intensity (or ratio) of the channel of the first rank found within limits is retained for further concentration calculation steps. If none of the defined channels are in range, the intensities of the one with the highest rank are used, but in such a case the final result is output with the Out of Range flag. Note: This step ends the intensity processing.
-* BCC (7, Concentration after Base Curve Calculation) : To give apparent concentrations.
-* CRC (8, Correction of Raw Concentration) : Calculation of interference in ratio concentration with iteration.
-* N1 (9, Normalization to 100%) : This stage converts relative in absolute concentrations. The operation is divided into two sub-stages:
-o Calculation of the Matrix element concentration
-o Calculation of the absolute concentration of all elements
-* PNC (10, Post-Normalisation Correction) : Calculation of interference in absolute concentration with iteration.
-* MRE (11, Matrix Element Recalculation) : Recalculation of the Matrix element concentration
-* TSC (12, Concentration after Type Standardization) : If the concentration analysis was done using a type standard, the type standard concentration correction takes place at this stage.
-* ME (13, Matrix Element Computation) : Recalculation of the Matrix element concentration.
-* FCC (14, Concentration after Formula Calculation using Concentrations) : Preferred for the calculation of pseudoes.
-* LDC (15, Concentration after Limit of Detection Replacement) : The limit of detection must be recalculated after a type standardization for check according to the Check Limit of Detection system parameter.
-Calibration
-Result of the calibration process. It contains :
-* Samples for the current instrument calibration
-* Coefficients for every curve
-* Interferences for each curve
-* Segments
-Calibration Batch
-Describes which samples are to be measured during Calibration.
-Calibration Process
-The process of measuring certified samples and  calculating the coefficients allowing to transform detected Intensities to Concentration. It uses MVR and may use CHAMELEON to speed up the process (saving three days, hence a few thousand dollars).
-Calibration Ranges
-Ranges of concentration, for each element, for a quality to be measured (in CARL it is called calibration ranges or calibration menus).
-CARL
-Calibration ARL. Databases and applications to 
-* construct a spectrometer (including construction of database for CLOE), 
-* configure Analytical SW
-* calibrate it, 
-* keep and enhance the Master Knowledge with new Application,
-* perform statistics from instruments in production,
-* view calibration curves of all the produced instruments (OES),
-* create CLOE2 knowledge database
-* manage all calibration samples.
-CATSS
-Computer Aided Tracking System of Specialties
-CCD
-Charge coupled device: Wide detector that allows detecting a range of optical lines.
-NOTE: this is very different from PMT (1PMT--> 1 Optical Line versus 1CCD --> many Optical Lines)
-CLOE, CLOE2
-Tool that translates customers requests into an Optical Plan. It uses part of the Master Knowledge. (Note: CLOE2 is the current iteration of CLOE; CLOE1 is not used anymore).
-CHAMELEON
-(CCD only, since it is based on Spectrum, which can only be measured with a CCD). A tool that generates fake measurements based on a limited set of actual measurements. The total set of actual+generated measurements is input to the regular MVR. This limits the need for samples (e.g. divide measured samples by 2 or 3) and therefore has a big gain in the time needed for calibration of the machine. Note that this is only for easySpark, which has lower specification (so this approximation from Chameleon is good enough).
-Channel
-Hardware line that transports the signal from the detector to the OXSAS software.
-It is also a software link between optical plan and analytical lines.
-Collimator
-A device to make X-Rays go parallel:
- 
-Concentration
-Concentration is the amount of an element in a sample, measured in % (weight %) or sometimes expressed in ppm for traces of elements (1 ppm = 0.0001%)
-Concentration are also available in samples certificates.
-
-Concentration is calculated from the measured intensity through the calibration coefficients and line choices
-Counting Time
-The time in which we read the data from the detector
-CountTime
-See Counting Time
-CountTimeGlobal
-See Counting Time
-CRC
-See Calculation Steps
-Crystal
-OI-xxxx
-Curve
-Correlation between intensity and concentration; can be divided into Segments.
-DeadTime
-Dead time is a parameter defined for each of the detectors used in our X-Ray instruments. An incident  X-ray  photon  produces  a series  of event that are  multiplied  in  the  avalanche process by multiplier. 
-
-The Deadtime can be defined as the time during which, after a photon has been detected (depending on the detection type of the detector), the detector cannot process the next event photon  detection. The time elapsed  between  the  entry  of  the  photon  and  the  avalanche production may be of the order of 100 nanoseconds. Thus, the detector is said to be dead between each avalanche process. In practical terms, this means that the photons entering the detector during the dead time are not counted since the detector has not totally recovered from the previous event. At high counting rates (high photon flux) the loss of counting events can be reasonably high.
-
-Most  modern  spectrometers  correct  this  loss  mathematically.  The dead  time can  be estimated using different photon counting rates. Since the output signal is proportional to the number of photons, any deviation from linearity indicates the extent of dead time. We define a typical default value of DT for each detectors, depending on the type of detector. 
-
-Then we calculate the real DT value by measuring samples to get high count rate. We build kind of linearity curve that is not perfectly linear due to DT of the detector. This way we can get the DT for each of the detectors. 
-
-Note that in case of low count rate on some detectors (due to low power of the instrument or low sensitivity of a monochromator for example) we decide to use the default DT value.
-DL, Detection Limit
-The Detection limit is the lowest concentration that could even be detected in a simple, clean matrix  it is not repeatable or reliable as a reported value in a real sample. This is a metric for the sensitivity of a curve on a low concentration of an Element (hence the pure sample)
-
-On OES: Defined as (3 * BEC * StandardDeviation) / 100 for a Pure sample.
-This is a metric for the sensitivity of a curve on a low concentration of an Element (hence the pure sample).
-
-On XR: Defined on a Pure sample as 
-
-* t = counting time
-* BEC (A1 = intercept), 
-* Sensitivity Q (A0= the slope) 
-* LoD = SQROOT (BEC/ Q * t) 
-
-See also BEC.
-Diffractor
-An element of a spectroscope that causes Diffraction, splitting the light beam into components that can be detected separately.
-Drift
-The Drift from an analytical point of view is the observation of the instrumental drift over a long period, due to ageing of different parts in the instrument, like the tube and detectors. The drift is managed by Setting Up Samples parameters and data.
-The drift is used to update the calibration curves response regarding the instrumental response. It enable to use a calibration curve built months or years ago without having to measure the collection of standard samples (that can be very long and need a lot of calibration samples).
-Duration
-Sometimes another word for Window, see PHD.
-EasySpark
-See OES EasySpark
-Elliptical Mask
-OI-xxxx
-Energy Profile
-OI-xxxx: defines Peak Position?
-Extension
-An Extension is a NSR: it is a customer-specific adaptation of a calibration range.
-FCC
-See Calculation Steps
-Firmware status
-Information raised up from the firmware to inform the analytical software about the instrument status
-FOR, Final Order Report
-The order for an instrument; contains financial details on how much it will cost.
-Global condition
-Set of parameters describing:
-* Source spark shape for OES,
-* HVPS
-* CCD Acquisition parameters
-Global Count
-Sum of the signal from the area between Threshold and Threshold+Window
-
-Gonio line
-Combination of XRF analytical parameters that allow the measurement of a specific analytical line on a goniometer:
-- power
-- transition
-- crystal 
-- primary beam device
-- secondary beam device
-Grade
-See Quality
-Grating
-Optical component used to disperse the light, composed of many grooves (for PMTs) or holographic (for CCD). Depending on the number of grooves and on the dispersive ability of the grating, the analytical line will be detected in 1st order, 2nd order, 3rd order, etc.
-HVCal, High Voltage Calibration
-HVCal (High Voltage Calibration) is a process that guarantees maximum sensitivity by adjusting the high voltage of the detectors for a given element. The optimum detector voltage for a certain wavelength is a known value. However, a difference remains because the high-voltage module is not linear and its output voltage is approximate. To correct this error, a correction is applied to the setpoint of the high-voltage generator. This correction is obtained by calculating the optimum regression between several real voltages, in general 4 or 5.
-
-We define HVCal for each of the couple crystal  detector present in the instrument.
-
-To define these real voltages, we measure an element in a sample with high concentration of this element. The theoretical high voltage of the element is applied to the detector and the X-Ray tube is supplied with default values (values defined in the HVCal window in Analytical Software). The high voltage of the detector is then modified in order to obtain the highest intensity. Once the real high-voltage is found, the intensity [mA] of the X-Ray tube is adjusted to obtain around 10 kcps so as we do not saturate the detector. The real high-voltage of detector and intensity [mA] of X-Ray tube obtained to pass the HVCAL are stored in the HVCAL data for each of the element.
-HVPS
-High Voltage Power Supply (for PMT)
-Instrument
-A spectrometer (either optical- or XRay-based)
-Instrument Knowledge
-Instrument-specific (i.e. for a particular instrument) adaptation of the Master Knowledge.
-Intensity
-the vertical axis (Intensity in gonio scan means maximum intensity)
-
-See also Global Count and Threshold/Window
-Interference
-Inphysics,interferenceis a phenomenon in which twowavessuperposeto form a resultant wave of greater, lower, or the sameamplitude.
-In MVR system it works as mathematical corrections. In OES we distinguish 2 different kind of interferences : 
-- additive (due to spectral overlap between 2 close optical lines)
-- multiplicative (often called inter-element)
-IOP-Procs
-A validation tool used during the QC phase of testing.
-Integration Time
-See Counting Time
-iSpark
-See OES iSpark
-LDAP
-Lightweight Directory Access Protocol, a protocol notably used for central storage of usernames and passwords.
-LDC
-See Calculation Steps
-Limit of Detection, LoD
-see DL
-LIMS
-Laboratory Instrument Management System; collects data from all spectrometers in a location and controls them. This is a workflow manager, out of scope for Toucan, as it interfaces with OXSAS.
-Line choice
-Kind of cookbook to set in Analytical software the best lines (segment) to use for calculating the concentration.
-It is mainly used to select the best line for an element based on the concentration level.
-Line Configurator Software
-This software is the tools used by sales representatives to gather customers requirements as calibrations and translate them, if possible into an optical plan. This software is currently a standalone software called CLOE2 and must be integrated into Toucan
-LS
-See Calculation Steps
-LOD
-See Limit-of-Dection
-Mapping
-See Spotting/Mapping
-Master Knowledge
-Master Knowledge is managed by R&D (to launch new applications) and by Manufacturing (updates, maintenance of the knowledge). It contains all the required information to build Calibration curves and to perform QA tests.
-Master Plan
-Impossible (i.e. cannot be built) optical plan that contains every available optical line, rules for availability, for a combination of matrixes for a specific grating
-Matrix
-see Base
-ME
-See Calculation Steps
-MRE
-See Calculation Steps
-MSSQL
-A database management system from Microsoft.
-MVR
-Multi-Variate Regression; algorithm to find the calibration coefficients.
-The calibration curve must be convex (it is a ratio between intensity and concentration--> if the concentration increases, the intensity should increase otherwise it means the model does not fit), and can be composed of multiple segments.
-N1
-See Calculation Steps
-NIST
-National Institute of Standards and Technology.
-Non-repudiation
-A proof that the data has not been changed after its first creation.
-NSR, Non-Standard Request
-A special request from a customer that will be charged separately, since it is not in the standard menu of options to choose from. Examples are extensions on calibration ranges (so-called extensions).
-NXRD
-OI-xxxx: what does it mean, and how does it relate to XRD?
-OBI
-See Calculation Steps
-OES
-Optical Emission Spectroscopy is a technique allowing to determine the elemental composition of a broad range of metals. This technique typically takes some tens of seconds to analyse a sample.
-OES iSpark
-(product line) Optical spectrometer, using PMT and optionally CCD. These are in fixed locations. 
-This instrument offers mid- to high-end performance.
-OES easySpark
-(product line) Optical spectrometer, using only CCD (has a special version of CARL).
-The easySpark is an entry level instrument.
-Optical Line
-Hardware position of a PMT, filters and slits
-Optical Plan
-Describes where PMTs are to be mounted, what sensitivity class, and which diffractor to be used. Also describes secondary optics such as filters.
-OXSAS
-The application that ships with the Spectrometer to the customer. It controls measuring and reports on the results. It also has the configuration of the instrument. 
-PCal, PCAL, Position Calibration
-Before being able to get analytical results from the instrument, it is essential to perform a calibration in position of crystals. When the crystal and detector equipment are positioned for a given angle, we want the system to be as much as possible at the best position but a mechanical positioning error occurs.
-
-The PCal (Positioning Calibration) enable to correct this error and to get the optimal positioning for a given angle . During the PCal, the crystal and detector equipment are slightly moved in order to obtain the maximum intensity so to get the real position.
-
-Background information:
-
-To verify the calibration of a position, we perform in general 3 scans by combination (crystal  detector  collimator). In principle and according to the samples, we divide the scans over the entire range of use of the crystal, that is: a low angle, middle of the range and a high angle. Identify the peaks and place the cursor at the centre of the upper part of the peak.
-Peak Position
-OI-xxxx, defined by Energy Profile
-Phase
-See Domain model of an OES Analysis : a Phase consists of many sparks, as part of a Run. Every Phase has its unique Source Condition.
-
-A Phase (in the context of XRD) is a crystal structure for a Molecule.
-PHD, Pulse Height Discriminator
-This is one pair of (Threshold, Window). Sometimes the Window-parameter is called Duration:
-
-
-PHD
-Method in OXSAS
-Threshold 
-Window 
-Window menu in CARL
-Threshold
-Duration
-Scan menu in CARL
-Threshold 
-Window 
-Scan menu in OXSAS
-Threshold 
-Window 
-Name of the marker in Energy profile result in OXSAS
-Threshold 
-Th+Window 
-Validation tool
-PHD Threshold
-PHD Window
-
-
-PMT
-PhotoMultiplier tube; detector used in optical spectrometry, comes in different classes of sensitivity. It has a narrow field of view, so the position determines what optical line can be detected.
-PNC
-See Calculation Steps
-Position Calibration
-See PCal
-Position Scan
-OI-xxxx, results in TwoTheta
-Profile
-Operation that consists in positioning and fine tuning OES spectrometer optical lines.
-
-(see also Energy Profile)
-Primary beam device
-Device that filters X-Ray before the sample
-Also see secondary beam device
-Prospect
-A company that has expressed interest in buying an instrument, it asks a quotation for an instrument. This prospect may later turn into a customer by ordering the proposed configuration.
-Pure
-A sample is called pure when it has a high concentration of the matrix (and hence low concentrations of other Elements).
-QA
-Quality Assurance: second step after manufacturing, precondition to Calibration.
-Allows to quantify a lines sensitivity and Detection Limit, and to compare these values with target values. It usually allows to check that optical alignment is correct and that settings (to operate correctly the different detectors) are also correct.
-QC
-Quality Control: first step after manufacturing, precondition to QA.
-Checks whether every individual part is working correctly: can the PMT on channel 24 detect a signal?
-See also StrongQC
-Quality
-A quality is a grade, or a combination of several grades. For a given matrix, chemical elements may vary between 2 values (Min-Max%), and these combinations of elements within specific ranges form the grades.
-For example, in an Fe matrix, for the quality Cast iron, the Carbon is usually between 2 and 4%, with Si between 1% and 3-4% and varying amounts of Manganese, and they are the main alloying elements. Iron alloys with lower Carbon contents are no more cast irons but are known as steels, and in this case other alloying elements are also used.
-QuantAS
-Software that performs semi quantitative analysis
-RCI
-See Calculation Steps
-Repro
-Running the same Measurements (with all its runs) again, multiple times. This gives information on the reproducibility of a Measurement; this is only used in the QA-phase of building an instrument.
-RII
-See Calculation Steps
-RNI
-See Calculation Steps
-Run
-See Domain model of an OES Analysis : a Run is one burn spot on a sample, consisting of many sparks.
-SCI
-See Calculation Steps
-Scintillator
-Specific kind of detector used for XRF analysis
-Secondary beam device
-OI-xxxx
-Also see primary beam device
-Segment
-Sub-curve used to have a best fit between intensities and concentration. Fitting optimization on the whole curve.
-Slit
-OI-xxxx
-Source condition
-See Analytical condition
-SourceMaster
-A database of 
-- for OES :
-o Optical Lines OES for CCD
-o OES Source conditions
-o OES global conditions
-- For XRF : 
-o XRF analytical assistant
-o UniQuant 
-o Gonio lines lib
-o Firmware status
-o Instrument status
-o Phases
-Spectrum
-Theelectromagnetic spectrumis the range offrequencies(thespectrum) ofelectromagnetic radiationand their respectivewavelengthsandphoton energies.
-Spotting / Mapping
-The ARL PERFORM'X provides the ability to restrict the analysis area to allow analysis of small samples and the ability to acquire X-ray maps for elements of interest. This feature uses an aperture or elliptical mask to restrict the analysed area. The size of the mask used defines the size of analysis area on the sample and defines the spatial resolution. The sample is moved using rotation and linear axis movements so that the feature to be analysed is at the optimum analysis position.
-The customer can choose:
-* spotting only: focus on points to be analysed on a sample surface
-* mapping/spotting: the spotting is enabled and the mapping softwareoption is added. So it requires an extra option in the ASW and enable to qualitatively investigate an area on a sample and have visualization of the distribution of chosen elements along the mapping area
-*  Prior to be able to run a sample using Spotting /Mapping, we have to calibrate in position the axis of positioning the sample. It is a mechanical calibration. That is done using a special sample holder with index of positioning and a sample of Iron with inclusion of Copper. By analyzing some points along the sample, we can determine if the positioning calibration is correctly done.
-
-Stability (Long and Short)
-Control of  the  stability of  instrument  to  check  reproducibility (Long  term)  and  repeatability (Short  term).  These  final  tests  are  used  to  validate  the  analytical 
-performances  of  the instrument.
-
-The  stability  tests  consist  in  a  SHORT  term  and  a  LONG term  validation. SHORT  is  1  hour measurement and LONG is 12 hours measurement (composed of 12 x 1 hour measurement). We measure lines that are defined according to instrument configuration. Depending on the instrument configuration, the number of lines may vary. The SHORT and LONG can be run at any time of the production of the instrument, for example to warm the instrument or to test components in case 
-of analytical or mechanical or any other type of problem, ... The SHORT and LONG term stability are run as part of QA process at the end QA to validate the analytical 
-performances of the instrument.
-
-Short time stabilities test the intensity difference between the runs (21 runs).
-The long time stabilities test something slightly different. Each of the 11 runs are averaged. So we do not care much about the intensity difference between the runs. We are checking the trend of the intensity: constant (OK), decrease (wrong), increase (wrong), ...
-StrongQC
-A more elaborate version of QC that tests all sensors, before shipping the instrument to Ecublens for completion of QA.
-SUS
-Setting-Up-Sample: a sample that is shipped with the machine to do regular drift-correction in intensity. These special samples are not used for calibrations, and so they are not managed in CARL (or Toucan) as calibration samples. They are not certified but they are homogenous for the elements they correct.
-Task
-Information in analytical software about measurement usage (SUS analysis, unknown sample analysis)
-Tau
-OI-xxxx, special sample for UniQuant
-Template instrument
-Every available components and specific parameters for a specific instrument. 
-Also see Master Plan
-Thermo Fisher Scientific, TFS
-TFS has the mission to enable our customers to make the world healthier, cleaner and safer. Whether our customers are accelerating life sciences research, solving complex analytical challenges, improving patient diagnostics and therapies or increasing productivity in their laboratories, we are here to support them.
-
-TFS will use Toucan.
-Threshold
-Defines a border for counting signal from the sensor, together with the Window:
-
-Toucan
-The set of data and applications needed to
-* create the optical plan, and
-* test and calibrate the resulting instrument to the customers use cases, and
-* maintain/track the installed-base of instruments.
-TSC
-See Calculation Steps
-TwoTheta
-See 2?
-UniQuant
-A method for XRF to measure an unknown sample without calibration.
-Note: part of the knowledge is in CARL, but must be enhanced in the future. (UniquantMaster)
-Window
-See Threshold for full explanation; Window defines the upper limit
-It is of range of selection of the amount of signal= integration of the intensity. The Threshold  Window is a focused range of interest that is determine in the analytical parameters of a line, to only select the amount of signal we want to see.
-XRD
-X-Ray spectrometer to study the matrix structure of a sample because it shows the diffraction angles. It uses less energy than XRF. XRD is also moving the sample in order to see its matrix structure (XRF only moves detector, not sample)
-NOTE: XRD is not in CARL now, but data structures are similar, so there seems to be a wish to have it in Toucan eventually.
-NOTE: the XRD operation is based on Braggs law.
-XRF
-X-Ray spectrometer; one detector that is moving around the sample to measure. This typically takes a few minutes for analysing a sample.
-
-
-
-3 DOMAIN MODELS
-(for more detailed, see the domain model in the Toucan-backend)
-3.1 Domain model of an OES Analysis
-
-3.2 Domain model of a calibration
-
-
-4 DOCUMENT INFO
-4.1 References
-
-Ref. #
-Document Title
-Doc. ID.
-
-
-
-
-
-4.2 Document Version History
-Version
-Date
-[dd Mmm yyyy]
-Author
-[First Last Name]
-Description of changes 
-Change ID
-
-1
-May 22, 2019
-Laurens Vrijnsen
-Initial version, based on visit to Ecublens
-PS-1605
-2
-May 23, 2019
-Laurens Vrijnsen
-Updated with comments from internal review
-
-3
-May 24, 2019
-Laurens Vrijnsen
-Updated with feedback from Vincent Colombani & Sandra Delahaye
-
-4
-May 28, 2019
-Laurens Vrijnsen
-Updated with feedback from Vincent Colombani & Sandra Delahaye
-
-5
-June 7, 2019
-Laurens Vrijnsen, Vincent Colombani
-Updates from review
-
-6
-June 13, 2019
-Laurens Vrijnsen
-Updates from Vincent Colombani incorporated
-
-7
-June 18, 2019
-Laurens Vrijnsen
-Upates from internal review: missing concepts
-
-8
-September 19
-Laurens Vrijnsen
-Added Repro
-
-9
-Oktober 19
-
-
-
-
-
-
-
-
-
-
-
-
-
-Glossary and domain knowledge
-Toucan
-Doc ID
-Doc Date
-Doc Version
-Doc Status
-:
-:
-:
-:
-TOUCAN-GLOS
-October, 2019
-09
-Proposal
-
-
-
-Page 2
-
-
-
-page 2 of 16
-
-
-
-
-
-
+2Ɵ, TwoTheta:OI-xxxx : outcome of Position Scan?
+Analytical Assistant:OI-xxxx
+AGC, Automatic Gain Control:Compensates the energy loss of the signal at high count rate. This loss is increasing with the count rate. So the AGC enable to place maximum peak pulse distribution at more or less always the same mV. The AGC is adjusted to start to compensate from 10 KCps and this is electronically calculated during the HVCAL.
+Analytical Condition:Configuration of the Source (e.g. energy profile for spark Argon-flow) + duration of phases.
+Analytical Line:Elements to be measured (wavelength, matrix, order, grating) and linked source conditions
+Analytical Method:OI-xxxx
+Analytical Plan:The Analytical Plan is the list of analytical lines required to meet the customer needs. It is based on the Optical plan. Describes what customer wants to measure, and in what priority (since trade-offs might be needed); the Optical Plan is a solution to this. The plan describes what lines need to be analysed, and which calibrations are needed for that.
+Analytical SW:The software that controls the instrument (OXSAS) + any tools to test it (such as IOP-Procs)
+Angular resolution:OI-xxxx
+Announcement:A message to inform specific users of CARL/Toucan that a significant change has been made.
+Application:Describes the required developments to do for each Matrix: all the required qualities, other specific applications such as Spark-DAT, extensions, etc.
+Argon:Inert gas usually used to measure wavelengths <190nm. It is currently used to flush the spark-chamber (OES-only, both iSpark and easySpark) but can also be used to fulfil spectrometers.
+ARL:Applied Research Laboratory, the old name of the Ecublens part of ThermoFisher.
+Article:An optional to be ordered for an instrument, OI-xxxx
+Base:Also called "Matrix": it is the main element that constitutes at least ~ 45-50% of the sample.
+BCC:See Calculation Steps
+BCI:See Calculation Steps
+BEA:Bulk Element Analysis, a business unit within Thermo Fisher Scientific.
+BEC, Background Equivalent Concentration:A quantitative measure of background level is called the "Background Equivalent Concentration", or BEC, which is defined as the concentration of a given element that exhibits the same intensity as the background, measured at a given wavelength.
+Bill-of-Material:The list of parts needed to construct a new instrument to order.
+C#:A modern programming language from Microsoft.
+Calculation Steps:Calculations by OXSAS on the data from its sensors
+Calibration:Result of the calibration process. It contains : Samples for the current instrument calibration, Coefficients for every curve, Interferences for each curve, Segments
+Calibration Batch:Describes which samples are to be measured during Calibration.
+Calibration Process:The process of measuring certified samples and calculating the coefficients allowing to transform detected Intensities to Concentration. It uses MVR and may use CHAMELEON to speed up the process (saving three days, hence a few thousand dollars).
+Calibration Ranges:Ranges of concentration, for each element, for a quality to be measured (in CARL it is called calibration ranges or calibration menus).
+CARL:Calibration ARL. Databases and applications to construct a spectrometer, configure Analytical SW, calibrate it, keep and enhance the Master Knowledge with new Application, perform statistics from instruments in production, view calibration curves of all the produced instruments (OES), create CLOE2 knowledge database, manage all calibration samples.
+CATSS:Computer Aided Tracking System of Specialties
+CCD:Charge coupled device: Wide detector that allows detecting a range of optical lines.
+CLOE, CLOE2:Tool that translates customer's requests into an Optical Plan. It uses part of the Master Knowledge. (Note: CLOE2 is the current iteration of CLOE; CLOE1 is not used anymore).
+CHAMELEON:(CCD only, since it is based on Spectrum, which can only be measured with a CCD). A tool that generates "fake measurements" based on a limited set of actual measurements. The total set of actual+generated measurements is input to the regular MVR. This limits the need for samples (e.g. divide measured samples by 2 or 3) and therefore has a big gain in the time needed for calibration of the machine. Note that this is only for easySpark, which has lower specification (so this approximation from Chameleon is good enough).
+Channel:Hardware line that transports the signal from the detector to the OXSAS software. It is also a software link between optical plan and analytical lines.
+Collimator:A device to make X-Rays go parallel
+Concentration:Concentration is the amount of an element in a sample, measured in % (weight %) or sometimes expressed in ppm for traces of elements (1 ppm = 0.0001%). Concentration are also available in samples certificates. Concentration is calculated from the measured intensity through the calibration coefficients and line choices
+Counting Time:The time in which we read the data from the detector
+CountTime:See Counting Time
+CountTimeGlobal:See Counting Time
+CRC:See Calculation Steps
+Crystal:OI-xxxx
+Curve:Correlation between intensity and concentration; can be divided into Segments.
+DeadTime:Dead time is a parameter defined for each of the detectors used in our X-Ray instruments. An incident X-ray photon produces a series of "event" that are multiplied in the avalanche process by multiplier.
+DL, Detection Limit:The Detection limit is the lowest concentration that could even be detected in a simple, clean matrix -- it is not repeatable or reliable as a reported value in a real sample. This is a metric for the sensitivity of a curve on a low concentration of an Element (hence the pure sample)
+Diffractor:An element of a spectroscope that causes Diffraction, splitting the "light beam" into components that can be detected separately.
+Drift:The Drift from an analytical point of view is the observation of the instrumental drift over a long period, due to ageing of different parts in the instrument, like the tube and detectors. The drift is managed by Setting Up Samples parameters and data.
+Duration:Sometimes another word for Window, see PHD.
+EasySpark:See OES EasySpark
+Elliptical Mask:OI-xxxx
+Energy Profile:OI-xxxx: defines Peak Position?
+Extension:An Extension is a NSR: it is a customer-specific adaptation of a calibration range.
+FCC:See Calculation Steps
+Firmware status:Information raised up from the firmware to inform the analytical software about the instrument status
+FOR, Final Order Report:The order for an instrument; contains financial details on how much it will cost.
+Global condition:Set of parameters describing: Source spark shape for OES, HVPS, CCD Acquisition parameters
+Global Count:Sum of the signal from the area between Threshold and Threshold+Window
+Gonio line:Combination of XRF analytical parameters that allow the measurement of a specific analytical line on a goniometer: power, transition, crystal, primary beam device, secondary beam device
+Grade:See Quality
+Grating:Optical component used to disperse the light, composed of many grooves (for PMTs) or holographic (for CCD). Depending on the number of grooves and on the "dispersive ability" of the grating, the analytical line will be detected in 1st order, 2nd order, 3rd order, etc.
+HVCal, High Voltage Calibration:HVCal (High Voltage Calibration) is a process that guarantees maximum sensitivity by adjusting the high voltage of the detectors for a given element. The optimum detector voltage for a certain wavelength is a known value. However, a difference remains because the high-voltage module is not linear and its output voltage is approximate. To correct this error, a correction is applied to the setpoint of the high-voltage generator. This correction is obtained by calculating the optimum regression between several real voltages, in general 4 or 5.
+HVPS:High Voltage Power Supply (for PMT)
+Instrument:A spectrometer (either optical- or XRay-based)
+Instrument Knowledge:Instrument-specific (i.e. for a particular instrument) adaptation of the Master Knowledge.
+Intensity:the vertical axis (Intensity in gonio scan means maximum intensity)
+Interference:In physics, interference is a phenomenon in which two waves superpose to form a resultant wave of greater, lower, or the same amplitude. In MVR system it works as mathematical corrections. In OES we distinguish 2 different kind of interferences : additive (due to spectral overlap between 2 close optical lines), multiplicative (often called inter-element)
+IOP-Procs:A validation tool used during the QC phase of testing.
+Integration Time:See Counting Time
+iSpark:See OES iSpark
+LDAP:Lightweight Directory Access Protocol, a protocol notably used for central storage of usernames and passwords.
+LDC:See Calculation Steps
+Limit of Detection, LoD:see DL
+LIMS:Laboratory Instrument Management System; collects data from all spectrometers in a location and controls them. This is a workflow manager, out of scope for Toucan, as it interfaces with OXSAS.
+Line choice:Kind of cookbook to set in Analytical software the best lines (segment) to use for calculating the concentration. It is mainly used to select the best line for an element based on the concentration level.
+Line Configurator Software:This software is the tools used by sales representatives to gather customer's requirements as calibrations and translate them, if possible into an optical plan. This software is currently a standalone software called CLOE2 and must be integrated into Toucan
+LS:See Calculation Steps
+LOD:See Limit-of-Dection
+Mapping:See Spotting/Mapping
+Master Knowledge:Master Knowledge is managed by R&D (to launch new applications) and by Manufacturing (updates, maintenance of the knowledge). It contains all the required information to build Calibration curves and to perform QA tests.
+Master Plan:Impossible (i.e. cannot be built) optical plan that contains every available optical line, rules for availability, for a combination of matrixes for a specific grating
+Matrix:see Base
+ME:See Calculation Steps
+MRE:See Calculation Steps
+MSSQL:A database management system from Microsoft.
+MVR:Multi-Variate Regression; algorithm to find the calibration coefficients.
+N1:See Calculation Steps
+NIST:National Institute of Standards and Technology.
+Non-repudiation:A proof that the data has not been changed after its first creation.
+NSR, Non-Standard Request:A special request from a customer that will be charged separately, since it is not in the standard "menu" of options to choose from. Examples are extensions on calibration ranges (so-called extensions).
+NXRD:OI-xxxx: what does it mean, and how does it relate to XRD?
+OBI:See Calculation Steps
+OES:Optical Emission Spectroscopy is a technique allowing to determine the elemental composition of a broad range of metals. This technique typically takes some tens of seconds to analyse a sample.
+OES iSpark:(product line) Optical spectrometer, using PMT and optionally CCD. These are in fixed locations. This instrument offers mid- to high-end performance.
+OES easySpark:(product line) Optical spectrometer, using only CCD (has a special version of CARL). The easySpark is an entry level instrument.
+Optical Line:Hardware position of a PMT, filters and slits
+Optical Plan:Describes where PMTs are to be mounted, what sensitivity class, and which diffractor to be used. Also describes secondary optics such as filters.
+OXSAS:The application that ships with the Spectrometer to the customer. It controls measuring and reports on the results. It also has the configuration of the instrument.
+PCal, PCAL, Position Calibration:Before being able to get analytical results from the instrument, it is essential to perform a calibration in position of crystals. When the crystal and detector equipment are positioned for a given angle, we want the system to be as much as possible at the best position but a mechanical positioning error occurs.
+Peak Position:OI-xxxx, defined by Energy Profile
+Phase:See Domain model of an OES Analysis : a Phase consists of many sparks, as part of a Run. Every Phase has its unique Source Condition.
+PHD, Pulse Height Discriminator:This is one pair of (Threshold, Window). Sometimes the Window-parameter is called "Duration"
+PMT:PhotoMultiplier tube; detector used in optical spectrometry, comes in different classes of sensitivity. It has a narrow field of view, so the position determines what optical line can be detected.
+PNC:See Calculation Steps
+Position Calibration:See PCal
+Position Scan:OI-xxxx, results in TwoTheta
+Profile:Operation that consists in positioning and fine tuning OES spectrometer optical lines.
+Primary beam device:Device that filters X-Ray before the sample. Also see secondary beam device
+Prospect:A company that has expressed interest in buying an instrument, it asks a quotation for an instrument. This prospect may later turn into a customer by ordering the proposed configuration.
+Pure:A sample is called "pure" when it has a high concentration of the matrix (and hence low concentrations of other Elements).
+QA:Quality Assurance: second step after manufacturing, precondition to Calibration. Allows to quantify a line's sensitivity and Detection Limit, and to compare these values with target values. It usually allows to check that optical alignment is correct and that settings (to operate correctly the different detectors) are also correct.
+QC:Quality Control: first step after manufacturing, precondition to QA. Checks whether every individual part is working correctly: "can the PMT on channel 24 detect a signal?" See also StrongQC
+Quality:A quality is a grade, or a combination of several grades. For a given matrix, chemical elements may vary between 2 values (Min-Max%), and these combinations of elements within specific ranges form the grades.
+QuantAS:Software that performs semi quantitative analysis
+RCI:See Calculation Steps
+Repro:Running the same Measurements (with all its runs) again, multiple times. This gives information on the reproducibility of a Measurement; this is only used in the QA-phase of building an instrument.
+RII:See Calculation Steps
+RNI:See Calculation Steps
+Run:See Domain model of an OES Analysis : a Run is one "burn spot" on a sample, consisting of many sparks.
+SCI:See Calculation Steps
+Scintillator:Specific kind of detector used for XRF analysis
+Secondary beam device:OI-xxxx. Also see primary beam device
+Segment:Sub-curve used to have a best fit between intensities and concentration. Fitting optimization on the whole curve.
+Slit:OI-xxxx
+Source condition:See Analytical condition
+SourceMaster:A database of for OES : Optical Lines OES for CCD, OES Source conditions, OES global conditions. For XRF : XRF analytical assistant, UniQuant, Gonio lines lib, Firmware status, Instrument status, Phases
+Spectrum:The electromagnetic spectrum is the range of frequencies (the spectrum) of electromagnetic radiation and their respective wavelengths and photon energies.
+Spotting / Mapping:The ARL PERFORM'X provides the ability to restrict the analysis area to allow analysis of small samples and the ability to acquire X-ray maps for elements of interest. This feature uses an aperture or elliptical mask to restrict the analysed area. The size of the mask used defines the size of analysis area on the sample and defines the spatial resolution. The sample is moved using rotation and linear axis movements so that the feature to be analysed is at the optimum analysis position.
+Stability (Long and Short):Control of the stability of instrument to check reproducibility (Long term) and repeatability (Short term). These final tests are used to validate the analytical performances of the instrument.
+StrongQC:A more elaborate version of QC that tests all sensors, before shipping the instrument to Ecublens for completion of QA.
+SUS:Setting-Up-Sample: a sample that is shipped with the machine to do regular drift-correction in intensity. These special samples are not used for calibrations, and so they are not managed in CARL (or Toucan) as calibration samples. They are not certified but they are homogenous for the elements they correct.
+Task:Information in analytical software about measurement usage (SUS analysis, unknown sample analysis...)
+Tau:OI-xxxx, special sample for UniQuant
+Template instrument:Every available components and specific parameters for a specific instrument. Also see Master Plan
+Thermo Fisher Scientific, TFS:TFS has the mission to "enable our customers to make the world healthier, cleaner and safer. Whether our customers are accelerating life sciences research, solving complex analytical challenges, improving patient diagnostics and therapies or increasing productivity in their laboratories, we are here to support them." TFS will use Toucan.
+Threshold:Defines a border for counting signal from the sensor, together with the Window
+Toucan:The set of data and applications needed to create the optical plan, and test and calibrate the resulting

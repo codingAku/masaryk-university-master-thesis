@@ -283,6 +283,12 @@ with left_col:
             st.button("Update User", on_click=update_user)
 
 with right_col:
+    if "deepseek-r1" in st.session_state.get("selected_model", ""):
+        st.warning(
+            "Warning, this model uses Chain of Thought process. "
+            "If you would like to see how the model uses domain knowledge and user instructions to generate a response, use this model. "
+            "Voice mode is disabled in this model."
+        )
     st.selectbox(
         "Select Model:",
         options=get_available_models(),
