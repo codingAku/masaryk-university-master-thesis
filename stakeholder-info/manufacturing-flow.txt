@@ -1,0 +1,61 @@
+manufacturing flow:
+Setup : configure OXSAS
+QC : “connection-check” & profiling of optics
+QA : “sensors usable”
+Calibration : “prepare for customer”
+Validation : “check of calibration”
+Reporting : reports & logbook
+Archiving : no more changes
+
+Manufacturing flow – shared steps:
+Note that in validation the names of the steps are sometimes different
+Select qualities
+Import
+Rename
+Modify lines
+Edit components / curves / samples / interferences
+Export lines
+Send quality to OXSAS
+Import measurements
+Import measurements
+Select runs
+Compute 
+Compute curves based on measurements
+FullMVR (only in QA and Calibration)
+Also a page to compute curves
+Effective page to experiment with interferences, weights, etc.
+
+
+MVR qualities - Importing
+Creating a new instrument quality
+Create components, curves, samples
+Import source:
+Master knowledge
+Instrument knowledge
+Both sources are turned into ImportSources
+Actual import is shared between importing from master knowledge and instrument knowledge
+This works because the structure is identical
+
+
+MVR service
+MVR calculation:
+Curve Fit
+Given a set of points, find me a polynomial curve that goes through all points as close as possible
+Interference validation
+Calculate the impact of all possible combinations of interferences
+Compute & FullMVR
+Compute
+(Re)Compute curve
+(Re)Compute Quality
+FullMVR
+Playground for experimenting
+Interferences
+Sample weights
+Nothing is saved until the curve is saved manually
+
+
+	
+
+
+
+

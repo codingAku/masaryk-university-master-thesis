@@ -1,0 +1,102 @@
+Full MVR
+This page has been locked for further editing after acceptance of the requirements.
+
+Full MVR will be present as a separate screen (next to Calculate), with functionality that is only available to the AnalyticalExpert.
+
+## Workflows
+The main goal for Full MVR is to build knowledge for the MVR calculation, including: sample selection, curve/segment creation, curve degree testing, and interference testing and selection. Specialists also use Full MVR to build QA knowledge, though QA curves are usually not interfered with. The following two main scenarios are covered by Full MVR:
+
+### Curve from Scratch
+- Select a component in the Quality of interest (no existing curve).
+- Start with a "raw" curve:
+  - Change the selection of samples to be used for that curve; initially, all samples are selected, but the user can limit that set (includes setting sample weights).
+  - On the Interferents tab, do not select interferents, but press "Calculate" (consider having this button also on the first tab).
+  - Evaluate curve behavior.
+  - Keep adding/removing samples until satisfied.
+  - Save the curve as "raw."
+- Follow up with corrected curves:
+  - Move to the Interferents tab.
+  - Select additive and/or multiplicative interferents.
+  - Press the "validate" button to view scores on the Validation tab.
+  - Based on "sign," "CV," "flip/flop," etc., determine interferents to add/remove.
+  - Optionally, change the selection of samples.
+  - Save the curve with interferents as "save as new curve."
+
+### Update Curve
+- Select a quality, component, and existing curve to be corrected.
+- Press "Validate" on the Interferents tab.
+- Update curve settings based on results from the Validation tab.
+- When satisfied, save the curve:
+  - Overwrite the existing one ("update") or
+  - Save as a new curve ("save as new curve").
+
+> **Note from Sandra Delahaye:** Currently, updating a curve directly isn't possible; modified segments are saved under new names and rearranged manually in "CARL OE > Instrument > Analytical > Mod-Know."
+
+## Ergonomics
+Ergonomics is crucial; no data (e.g., curves under development) is saved to the database until explicitly decided by the Expert. Navigation to another quality/component/curve discards unsaved changes.
+
+## Requirements
+
+### Setup of Full MVR
+
+| ID             | Description                                                                                           | Source          | Status    |
+|----------------|-------------------------------------------------------------------------------------------------------|-----------------|-----------|
+| SwRS.FULL.01   | Full MVR on separate screen (AnalyticalExpert only). Accessible for each quality with Compute screen. | Sandra Delahaye | Completed |
+| SwRS.FULL.02   | Full MVR has tabs: Curves, Interferences, Validation, Numerical, Graphical.                           | Sandra Delahaye | Completed |
+| SwRS.FULL.03   | Every tab shows matrix, quality, component + curve. Instrument family and number at top-left UI.      | Sandra Delahaye | Completed |
+| SwRS.FULL.SAV.01 | When saving a curve, the user must provide segment name and optional remark. Data stored in Toucan. | Sandra Delahaye | Completed |
+
+## "Curves" Tab
+
+| ID                | Description                                                                                      | Status    |
+|-------------------|---------------------------------------------------------------------------------------------------|-----------|
+| SwRS.FULL.STP.01a | Quality dropdown (name, Base-Element, Version).                                                   | Completed |
+| SwRS.FULL.STP.01b | "QuickSwitch instrument" button allows selecting another OES/XR instrument quickly.                | Completed |
+| SwRS.FULL.STP.01c | Users can type the instrument number in the dropdown box.                                         | Completed |
+| SwRS.FULL.STP.02  | Components list sorted by name, showing Name, Element, Internal Standard.                         | Completed |
+| SwRS.FULL.STP.03 | Lists available curves with segment name and remark; "no curve" option available.                   | Completed |
+| SwRS.FULL.STP.04a | Table of samples shows selection status, name, weight, quality, intensity, sigma, concentration, accuracy, and certification status with color coding. | Completed |
+| SwRS.FULL.STP.04b | Samples filled based on imported data (ignoring QA "Repro" measurements).                           | Completed |
+| SwRS.FULL.STP.05 | Table to select/deselect samples based on metallurgical qualities.                                 | Completed |
+| SwRS.FULL.STP.06 | Concentration filter control (min/max) updates sample selections dynamically.                      | Completed |
+| SwRS.FULL.STP.07 | Sample selection logic detailed for curves, "no curve," quality selections, and manual control.     | Completed |
+| SwRS.FULL.STP.08 | Weight settings: "all 1," "f(Concentration)," "1 / Intensity."                                    | Completed |
+| SwRS.FULL.STP.10 | CSV sample export functionality (back-end only).                                                   | Completed |
+
+### "Interferences" Tab
+| ID             | Description                                                                                            | Status    |
+|----------------|--------------------------------------------------------------------------------------------------------|-----------|
+| SwRS.FULL.INT.01 | Table of BaseElements with selection for additive/multiplicative interferents.                       | Completed |
+| SwRS.FULL.INT.02 | Interference table with element details: selection, min/max concentration, number of samples.        | Completed |
+| SwRS.FULL.INT.03a | Button "MVR" computes curve based on settings, opening Numerical tab automatically.                 | Completed |
+| SwRS.FULL.INT.03b | User specifies curve degree (0-3).                                                                  | Completed |
+| SwRS.FULL.INT.04b | "ITF validation degree": free (default), 1, 2, or 3.                                                | Completed |
+| SwRS.FULL.INT.05 | No save button on this tab; validation is required first.                                           | Completed |
+
+### Numerical and Graphical tabs
+- Numerical results and coefficients overview (save button present).
+- Graphical representation of results (save button present).
+
+### Validation tab
+- Results erased upon any change on other tabs.
+- Includes "Synthesis" summary table and detailed combinations table.
+- Tooltips for "CV%," "Error," "r²," and "Flip/Flop" definitions.
+
+> **Discussion:** Clarify "flip/flop" usage with Sandra Delahaye.
+
+### Computation & Validation
+- Computation triggered via "MVR" button from Interferences tab.
+- Numerical/Graphical tabs show computed results.
+- "Validate" button calculates interference effectiveness (summary and combinations detailed on Validation tab).
+
+> **Implementation Notes:**
+> - Ensure two-step saving logic: numerical/graphical tabs only.
+> - Interference coefficients auto-computed.
+> - CSV export handled by backend.
+
+---
+
+**UI ergonomics critical:** Minimize clicks, clearly indicate unsaved state, facilitate quick testing.
+
+This structured approach ensures clarity and ease of use for experts performing complex curve analyses in Full MVR.
+

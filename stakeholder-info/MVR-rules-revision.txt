@@ -1,0 +1,98 @@
+MVR Rules Revision
+
+This document captures the updates needed for MVR rules in Toucan.
+
+BUSINESS REQUIREMENTS
+
+ID: MVR_OES.B.01
+Requirement: Manufacturing
+Priority: Must
+
+SAMPLE RULES (TOUC-2250 - Sample rules - import measurement DONE)
+
+ID: MVR_OES.SR.01
+Description: Remove sample column and sigma check from Curve check table
+Source: ASP team
+Priority: Must
+
+ID: MVR_OES.SR.02
+Description: Add warning: "1 quality has status Not OK: number of samples not matching with expected number" when importing incorrect number/name of samples (both QA and Calibrations)
+Source: ASP team
+Priority: Must
+
+SOLD-OUT SAMPLE MANAGEMENT (TOUC-2207 - In Progress)
+
+ID: MVR_OES.SSM.01
+Description: Do not update sample data when imported to the instrument
+Source: ASP team/MFG
+Priority: Must
+
+RULES REQUIREMENTS (TOUC-2437 - DONE)
+
+ID: MVR_OES.RR.01 - Additive interference
+ID: MVR_OES.RR.02 - Concavity
+ID: MVR_OES.RR.03 - Inflection
+ID: MVR_OES.RR.04 - Multiplication interference
+ID: MVR_OES.RR.05 - R²
+ID: MVR_OES.RR.06 - Root
+ID: MVR_OES.RR.07 - SEE
+ID: MVR_OES.RR.08 - Slope
+Source: ASP team
+Priority: Must
+
+Detailed Rules:
+
+ADDITIVE INTERFERENCE
+Display name: +Itf.
+Checked parameter: K0ITF > 0
+Provided description: Additive interferences should be negative
+
+CONCAVITY
+Display name: Concavity
+Checked parameter: bad_concavity
+Provided description: Curve must be concave upward due to saturation effect. Intensity tends toward an asymptote while concentration increases.
+
+INFLECTION
+Display name: Inflection
+Checked parameter: accepted_with_inflection
+Provided description: Inflection point in the low concentration area.
+
+Checked parameter: refused_for_inflection
+Provided description: Inflection point in the domain. The position of the inflection point can trigger an error if above the segmentation point or use a threshold (%Cmax) to differentiate between acceptance and refusal.
+
+MULTIPLICATION INTERFERENCE
+Display name: *itf.
+Checked parameter: NONE
+Provided description: Strong multiplicative interference causes convergence issues. Current implementation uses a threshold of +/- 500.
+
+R2
+Display name: R2
+Checked parameter: NONE
+Provided description: NONE
+
+ROOT
+Checked parameters:
+- no_root: Curve does not intersect with intensity axis.
+- root_out: Curve intersects intensity axis outside the maximum range.
+- positive_intercept: Curve has a positive intercept with the concentration axis.
+- wrong_extremum: Curve has a problematic extremum (2nd or 3rd degree) inside the range of interest.
+
+SEE
+Display name: SEE
+Checked parameter: NONE
+Provided description: NONE
+
+SLOPE
+Display name: Slope
+Checked parameter: negative_slope
+Provided description: Curve has a negative slope.
+
+Segment statuses (Segment1_QA, Segment1_Calibration, Segment2_Calibration):
+- Toucan Status: NotOK, OkWithWarnings, Ok, NONE
+- Default Accepted Flag: FALSE, TRUE, NONE
+- Approval Rights: Analytical Expert, Analytical Specialist, Manufacturing Engineer, NONE
+
+Remarks:
+- Multiplication interference threshold (+/- 500) confirmed implemented.
+- Inflexion changes should trigger recomputation of segments.
+

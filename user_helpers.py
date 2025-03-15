@@ -1,4 +1,5 @@
 import streamlit as st
+import chat_helpers
 import db_helpers
 
 # -----------------------------
@@ -17,6 +18,7 @@ def update_persona(new_persona):
         st.session_state["persona"]["audios"] = db_helpers.get_user_audios(new_persona["id"])
     else:
         st.session_state["chat_history"] = []
+    chat_helpers.initialize_persona_session()
 
 def update_user():
     # Backup the current persona so we can restore if cancelled

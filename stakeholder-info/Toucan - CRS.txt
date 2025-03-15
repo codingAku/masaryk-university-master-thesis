@@ -1,0 +1,2184 @@
+
+
+
+
+
+
+Customer
+Thermo Fisher Scientific
+Project
+Toucan
+Author
+Laurens Vrijnsen
+
+
+
+
+
+
+
+
+
+
+
+
+Manufacturing Requirements confirmed by:
+
+
+
+--------------------------------------
+Ludvik Simersky
+Manager, Manufacturing, MSD Operations
+
+
+
+
+--------------------------------------
+Miroslav Bochnicek
+Manager, Manufacturing Engineering, MSD Operations
+
+
+
+
+--------------------------------------
+Rostislav Such
+Engineer II, Manufacturing Engineering, MSD Operations
+
+
+
+
+--------------------------------------
+Robert Bhm
+Sr Manager, Operations, MSD Operations
+
+OPEN ISSUES
+Before approval of this document, all open Issues must be solved and this table must be removed. 
+If this is not possible, a Change Request must be submitted.
+
+
+ID
+Description
+Due date
+[dd Mmm yyyy]
+Owner 
+Change ID
+
+OI-0033
+more details are needed on the generation of checklist for QC in OES. Request has been made to make sure we will not implement something twice and to make sure the owner/responsible of data is clearly identified. 
+QC Documents sent & Final report tests
+July 29
+VCO
+
+OI-0042
+we need more details on XRF, but this is not needed for Milestone 1.
+
+XRF will be captured completely in a new version of this document, including a re-scan of the Actors.
+
+VCO
+
+OI-0043
+Details on UniquantMaster Data are missing
+
+VCO
+
+OI-0044
+Details on XRD as missing
+
+VCO
+
+OI-0045
+MVR on XRF: how done?
+
+VCO
+
+
+
+
+
+
+1 INTRODUCTION
+1.1 Purpose 
+The purpose of this CRS is to document the requirements of all stakeholders involved in the whole lifecycle of the instrument manufacturing and development through Toucan software.
+1.2 Scope
+The scope of this CRS is OES and XRF, UniquantMaster/ Uniquant; notably out-of-scope are:
+* Full support for XRD systems; (note: XRD has some overlap with XRF, this overlap is supported)
+* (further) automation of calibration.
+2 SYSTEM DESCRIPTION
+2.1 System Context
+The context of Toucan is shown in the figure below:
+
+
+
+Figure 2.1: Toucan context
+
+At its core, Toucan is the set of data and applications needed to develop and manufacture spectroscopes, notably:
+* Announcement
+* Create the optical plan using the Lines Configuration Software (LCS),
+o including managing the Master Knowledge (OES, XRF, UniQuant).
+* Test and calibrate the resulting instrument to the customers use cases
+o including management of samples,
+o including creation of reports.
+* Maintain/track the whole installed-base of instruments,
+o Including generation of statistics
+
+2.2 Intended users & stakeholders
+Intended users are captured as Actors in Section 3.2 Actors.
+
+2.3 User environment
+Toucan is used within departments of Thermo Fisher Scientific. Part of Toucan must be used outside of Thermo Fisher Scientific : for sales support (OES Optical layout creation, XRF instrument configuration). Users must use credentials to launch Toucan, and based on the associated roles, have (limited) access to functionalities.
+
+
+3 USE-CASES
+3.1 Overview
+In the use-cases, following guidelines apply for frequency:
+
+Frequency
+Description
+High
+Use-case is applicable to every order/build (i.e. ~ a dozen times per day)
+Medium
+Use-case is applicable roughly once per week
+Low 
+(lower)
+
+Priorities mean following: 
+Priority
+Description
+High
+Must-have feature
+Medium
+Should-have feature
+Low
+Could-have feature (i.e. nice-to-have)
+
+The use-cases can be summarized on a high level in following:
+
+
+
+
+3.1.1 Visualisation of flow Create Optical Plan for Customer
+
+
+3.1.2 Visualization of flow Manufacture instrument
+
+
+3.1.3 Visualization of flow Support installed-base
+
+
+3.1.4 Visualization of flow Change MasterKnowledge
+
+
+3.2 Actors and Stakeholders
+Actors in the use-cases are:
+
+Actor
+ID
+Description
+Marketing Analytical Specialist
+ACT_MKT
+Checks Sales Optical Plan against customers analytical needs, and proposes best analytical plan to meet customers expectations with fulfilling calibration ranges and update master optical plan
+Firmware developer
+ACT_FW
+Person in charge of electronics & Firmware development
+IT Department
+ACT_IT
+IT Department of Thermo Fisher Scientific. It is in charge of database backup and availability. It provides the customer PC and its configuration based on RD & Manufacturing requirements
+Manufacturing
+ACT_MAN
+Builds the instrument to the Optical Plan, creates and performs QC Plan, QA Plan, and Calibration Plan. Can investigate on field instrument on demand. Also Manage samples (with R&D Specialist)
+OES Product manager
+ACT_OES
+Creates template instruments for OES; represented by Jean Marc Bohlen
+Profiling Team
+ACT_PRF
+Mounts the optical plans and perform profile.
+The Profiling Team is part of Manufacturing (and will be shown as Manufacturing in the UseCase overview)
+R&D Analytical specialist
+ACT_RD
+Develops new instrument-types, new calibrations, new technologies
+Has little programming experience (Both MathLab or Python), all programming is done by Software department (Product Specialist)
+Sales Representative
+ACT_SAL
+Uses LCS to create Analytical Plan based on the customers wishes, and then propose an Optical Plan to solve that. The optical plan has to be validated by the marketing analytical specialist.
+Service 
+ACT_SRV
+Service engineers that visit the Customers to solve problems.
+Technical Support Group
+ACT_TSG
+The TSG is in charge of helping customers questions during troubleshooting
+Upgrading
+ACT_UPG
+Will upgrade a machine for a customer, in the factory, adding new analytical line or new calibration or new element
+XRF Specialist
+ACT_XRF
+Specialist on the template XRF machines and linked calibrations (applications)
+System engineers
+ACT_SYS
+Responsible for production line of XRF/OES
+SW specialist Brno
+ACT_SWS
+Responsible for SW and computer HW
+NPI lead
+ACT_NPI
+Responsible for new system/modification/updates into manufacturing. Responsible also for operators training.
+
+Additionally, these are stakeholders (but not actively contributing in the use-cases) in the Toucan system:
+
+Stakeholder
+Description
+Customer
+A customer of Thermo Fisher Scientific, interested in ordering a Spectrometer. After delivery, the Customer will use Analytical SW to interact with the instrument.
+Planning
+Ensures availability of parts for Manufacturing
+Product specialist 
+Team in charge of maintaining CARL and Toucan.
+
+Representatives for the above roles are captured in [Representatives].
+3.3 Use case CRS_UC_Locate_000 User location awareness
+Use Case
+CRS_UC_Locate_000 : User location awareness
+Actors
+* Every users excepted Sales representatives
+Goal of Primary Actor
+* User needs to use local knowledge
+Precondition
+Customer can log in Toucan
+
+Post condition
+* User site is known. User will use local knowledge by default
+
+Main Flow
+1. User launch Toucan application
+2. Login window is displayed and current site is shown in it.
+3. User logs on 
+4. User site is known
+5. User uses local knowledge.
+Alternative Flow Manage other sites knowledge
+1. Specific User can change site once in Toucan
+2. A specific site can display all sites knowledge
+Non-functional
+N/A
+Frequency of use
+High 
+
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+3.4 Use case CRS_UC_OptPlan_000 Create Optical Plan
+This use-cases has specializations for each of the machine types, but the general case is :
+Use Case
+CRS_UC_OptPlan_000 : Create Optical Plan for Customer
+Actors
+* Sales Representative, 
+* Marketing Analytical Specialist
+Goal of Primary Actor
+* Sales Representative wants to make a quotation
+* Marketing Analytical Specialist wants to have a correct Optical Plan.
+Precondition
+Customer has indicated what the needs are for a new spectrometer (required calibrations)
+
+Post condition
+* Optical Plan created,
+* All data for a Quotation to Customer has been constructed (the actual sending of a Quotation is out-of-scope for Toucan)
+
+Main Flow
+3. Sales Representative sets customers required calibrations in the Line Configurator Software  (LCS), which is part of the Toucan application.
+4. Sales Representative uses LCS  to create a configuration: (attention points depend on the machine type)
+5. Marketing Analytical Specialist validates it against any knowledge that is not part of the Master Knowledge yet (LCS has already applied the rules present in the Master Knowledge).
+6. The Marketing Analytical Specialist sends the proposal to Sales Representative for quotation to customer.
+Alternative Flow Conflicting Requirement
+7. In case of conflicting requirements detected in Step 2, the Customers priorities are used to make a trade-off between capabilities.
+8. New rules can be added to improve later results
+Alternative Flow Conflicting Solution
+1. In Step 3, when the proposed optical plan contains conflicts, or requires specialties, the Marketing Analytical Specialist proposes changes to the Optical Plan. 
+2. Different possibilities may be proposed to the customer.
+Non-functional
+N/A
+Frequency of use
+High 
+
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+
+3.4.1 Use Case CRS_UC_OptPlan_001 Create OES Optical Plan for Customer
+Specializes Use case CRS_UC_OptPlan_000 Create Optical Plan.
+Use Case
+CRS_UC_OptPlan_001 : Create OES Optical Plan for Customer
+Actors
+
+Goal of Primary Actor
+
+Precondition
+
+Post condition
+
+Main Flow
+(Step 2) :Sales Representative uses LCS  to create an Optical Plan:
+1. From the master plans, LCS select the lists of master plans for the required matrixes
+2. the LCS tries to find optical lines combination (applying defined rules)  that fit the customers demands
+3. The resulting plan is saved and sent to the Marketing Analytical Specialist for confirmation, together with a report that lists the customers demands
+
+Alternative Flow Extension Requirement
+(Step 2) :Sales Representative uses LCS  to create an Optical Plan:
+1. From the master plans, LCS select the lists of master plans for the required matrixes
+2. the LCS tries to find optical lines combination (applying defined rules)  that fit the customers demands
+3. The resulting plan is saved and sent to the Marketing Analytical Specialist for confirmation, together with a report that lists the customers demands
+4. Extension requirement are recorded in the CATSS part of SBM Thermofisher ERP.
+Alternative Flow Conflicting Solution
+
+Non-functional
+
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.4.2 Use Case CRS_UC_OptPlan_003 Manage OES Optical Plan Rules
+Use Case
+CRS_UC_OptPlan_003 : Manage OES Optical Plan Rules
+Actors
+* Marketing Analytical Specialist
+* Profiling Team
+* R&D Analytical specialist
+Goal of Primary Actor
+* Better automatic OES Optical plan creation by improving rules
+Precondition
+* Identify new rule
+
+Post condition
+* Optimized Optical Plan applying new rules,
+
+Main Flow
+1. One of the actors reports that a new optical plan rule must be added
+2. Marketing Analytical specialist adds the new rule. Current rules have the following meaning :
+- specific lines  must be  mounted (or not) if 1 or a combination of lines is mounted
+- specific lines must be mounted (or not ) based on selected calibration (range of the line in a specific Matrix)
+- specific lines must be mounted based on required Matrix
+- Priority of a line selection for a specific element
+
+Non-functional
+Each rule must be applied for a specific grating
+Frequency of use
+Medium
+
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+3.4.3 Use Case CRS_UC_OptPlan_002 Create XRF/XRD Optical Plan for Customer
+Specializes Use case CRS_UC_OptPlan_000 Create Optical Plan.
+Use Case
+CRS_UC_OptPlan_002 : Create XRF Optical Plan for Customer
+Actors
+XRF Specialist
+Goal of Primary Actor
+
+Precondition
+
+Post condition
+
+Main Flow
+ (Step 2) : Sales Representative uses LCS  to create a specific configuration :
+5. from the Analytical assistant, it selects best combination of components to fit customers requirements (matrixes, ranges, calibrations, extension, customer-specific samples, )
+6. parameters that should be available to choose the best combination are :
+o Instrument type
+o Number of goniometers
+o Number of monochromators (possibly pairing some of them)
+o number of components (crystals, Primary beam devices, detectors )
+o instrument power
+o software options (Uniquant, mapping, spotting)
+7. The resulting configuration is saved and sent to the analytical specialist for confirmation. A report summing up customers requirements and result is also sent to the analytical Specialist
+Alternative Flow Conflicting Requirement
+
+Alternative Flow Conflicting Solution
+
+Non-functional
+
+Frequency of use
+High
+Priority
+Medium
+Origin
+
+Open issues
+
+3.4.4 Use Case CRS_UC_OptPlan_004 Manage XRF Optical Plan Rules
+Use Case
+CRS_UC_OptPlan_004 : Manage XRF Optical Plan Rules
+Actors
+* XRF Specialist
+Goal of Primary Actor
+* Better automatic XRF instrument configuration creation by improving rules
+Precondition
+* Identify new rule
+
+Post condition
+* Optimized instrument configuration applying new rules,
+
+Main Flow
+1. XRF Specialist reports that a new configuration rule must be added
+2. XRF Specialist adds the new rule. Current rules have the following meaning :
+- specific lines  must be  mounted (or not) if 1 or a combination of lines is mounted
+- specific lines must be mounted (or not ) based on selected calibration (range of the line in a specific Matrix)
+- specific lines must be mounted based on required Matrix
+- Priority of a line selection for a specific element
+- Priority on mounting mono/ mono pairs
+
+Non-functional
+
+Frequency of use
+High (every XRF new order)
+
+Priority
+Medium
+Origin
+
+Open issues
+N/A
+
+
+3.5 Use-cases Manufacture instrument
+This has multiple parts, different for the types of machines
+
+3.5.1 Use-case CRS_UC_Manufacture_001 Build from Optical Plan OES
+Use Case
+CRS_UC_Manufacture_001 : Build from Optical Plan OES
+Actors
+Manufacturing
+Planning
+(OES) System Engineer
+SW Specialist
+Goal of Primary Actor
+Build a calibrated instrument
+Precondition
+Optical Plan is available and the instrument order has been confirmed
+
+Post condition
+Instrument has been built and calibrated.
+
+Main Flow
+1. Profiling Team instructs Toucan to create a Bill-of-Material from the Optical Plan that is sent to the planning (see Use-case CRS_UC_BOM_001 Create Bill-of-Material OES & XRF) 
+2. Manufacturing builds the instrument
+3. Manufacturing configures analytical software (see Use-case CRS_UC_SETUP_001 Setup Analytical software)
+4. Manufacturing performs QC (see Use-case CRS_UC_QCOES_001 Perform QC on OES)
+5. Manufacturing performs QA (see Use-case CRS_UC_QA_001 Perform QA on OES)
+6. Manufacturing performs Calibration (see Use-case CRS_UC_CALIB_001 Perform Calibration)
+7. Manufacturing perform Validation tests (see Use-case CRS_UC_VALID_001 Perform Validation)
+8. Manufacturing create production, calibration and client report  (see Use-case CRS_UC_REPORT_001 Create reports)
+9. Manufacturing archives the instrument (see Use-case CRS_UC_ARCH_001 Archive instrument)
+Alternative Flow 
+N/A, see sub-use-cases.
+Non-functional
+1. It is crucial that the instrument does not have any copy of (parts of) the Master Knowledge, as this might accidentally ship to the Customer then.
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+3.5.2 Use-case CRS_UC_Manufacture_002 Build from Optical Plan XRF
+Use Case
+CRS_UC_Manufacture_002 : Build from Optical Plan XRF
+Actors
+Sales Administration
+Manufacturing
+Planning
+(XRF) System Engineer
+SW Specialist
+Goal of Primary Actor
+Build a calibrated instrument
+Precondition
+Optical Plan is available and the instrument order has been confirmed
+
+Post condition
+Instrument has been built and calibrated.
+
+Main Flow
+1. Sales administration validates the order, the bill of material and the SRT are created by Toucan 
+2. Instrument configuration is created in Toucan
+3. Manufacturing builds the instrument
+4. Manufacturing configures analytical software (see Use-case CRS_UC_SETUP_001 Setup Analytical software)
+5. Manufacturing performs QC/QA (see Use-case CRS_UC_QCXRF_001 Perform QC/QA on XRF/XRD)
+6. Manufacturing performs setup of Uniquant (see Use-case CRS_UC_SETUP_002 Setup UNIQUANT)
+7. Manufacturing performs Calibration (see Use-case CRS_UC_CALIB_001 Perform Calibration)
+8. Manufacturing perform Validation tests (see Use-case CRS_UC_VALID_001 Perform Validation)
+9. Manufacturing create production, calibration and client report (see Use-case CRS_UC_REPORT_001 Create reports)
+10. Manufacturing archives the instrument (see Use-case CRS_UC_ARCH_001 Archive instrument)
+Alternative Flow 
+N/A, see sub-use-cases.
+Non-functional
+The instrument knowledge is a subset of the master knowledge that fits with the instrument configuration, tailored to using the instrument. It is crucial that the instrument does not have any copy of other parts of the Master Knowledge, as this might accidentally ship to the Customer then.
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+
+3.6 Use-case CRS_UC_BOM_001 Create Bill-of-Material OES & XRF
+Use Case
+CRS_UC_BOM_001 : Create Bill-of-Material OES & XRF
+Actors
+Profiling Team
+Planning
+Sales Administration
+Goal of Primary Actor
+Create a Bill-of-Material that ensures that Manufacturing builds the correct instrument.
+Precondition
+OES Optical Plan is available.
+XRF Instrument configuration is available.
+Post condition
+Bill-of-Material available.
+
+Main Flow OES
+1. OES : Profiling team retrieves the verified Optical Plan from Toucan,
+2. Profiling team instructs Toucan to generate an XML based Bill-of-Material for it; notably the list of the PMT - and their sensitivity classes are of importance, mirrors, filters, slits.
+3. Bill of material is sent to the planning team who adds it to the SRT content that contains standard components of the instrument (currently created by Sales Administration)
+4. Stickers are created to identify each lines of the spectrometer
+Alternative Flow XRF 
+1. Sales Administration confirm the order in Toucan,
+2. Order confirmation makes Toucan to generate an XML based Bill-of-Material and part of the SRT for it ; 
+3. Bill of material is sent to the planning team
+Non-functional
+Tool to manage the XML bill-of-material is out of scope
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+
+3.7 Use-case CRS_UC_SETUP_001 Setup Analytical software
+Use Case
+CRS_UC_SETUP_001 : Setup Analytical software
+Actors
+Manufacturing
+Goal of Primary Actor
+Ensure that analytical software can control the instrument (by knowing its relevant properties)
+Precondition
+Instrument has been built.
+
+Post condition
+analytical software can control the instrument
+
+Main Flow
+1. Manufacturing perform analytical software configuration system (DB or else) creation through Toucan. 
+2. Manufacturing instructs Toucan to send the Instrument Data to OXSAS; this data contains (amongst others) 
+* type of instrument
+* configuration of the instrument: 
+* For OES : 
+* optical layout (channel numbers for each optical line)
+* analytical lines
+* Source conditions
+* Global conditions
+* Basic information for QC
+* .
+* For XRF :
+* Instrument configuration 
+* Available crystal
+* Available detectors
+* Available primary beam filter (collimator, filters)
+* Analytical assistant containing every available analytical lines for the instrument
+* Basic information for QC
+* 
+* For XRD 
+* Same as XRF + crystallography data
+* 
+Alternative Flow Upgrade scenario
+1. In an upgrade-scenario, the analytical software settings are re-created/overwritten, and
+2. Toucan will keep a reference to the previous configuration.
+Non-functional
+1. Traceability: Keeping track of the history of an instrument is important
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.8 Use-case CRS_UC_SETUP_002 Setup UNIQUANT
+Use Case
+CRS_UC_SETUP_002 : Setup UNIQUANT
+Actors
+Manufacturing
+Goal of Primary Actor
+Ensure that analytical software can use Uniquant software (by knowing its relevant properties)
+Precondition
+Instrument has been built.
+
+Post condition
+Analytical software can perform Uniquant calibration
+
+Main Flow
+1. Manufacturing select components from the instrument configuration that will be used by UniQuant to perform calibration and analysis
+2. Manufacturing instructs Toucan to send UniquantMaster Data to UniQuant client database ; this data contains OI-0043: What data is in the UniquantMaster Data?
+Alternative Flow Upgrade scenario
+1. In an upgrade-scenario, the analytical software settings are re-created/overwritten, and
+2. Toucan will keep a reference to the previous configuration.
+Non-functional
+Traceability: Keeping track of the history of an instrument is important
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.9 Use-case CRS_UC_RESTORE_001 Recreating analytical software from backup
+The next use case is an extension to Setting-up OXSAS:
+
+Use Case
+CRS_UC_RESTORE_001 : Recreating analytical software from backup
+Actors
+Service, Manufacturing
+Goal of Primary Actor
+Ensure that analytical software is configured the same as when the instrument left Manufacturing.
+Precondition
+* Instrument is at the Customer; Customer wants Analytical SW returned to the original settings (e.g., Customer has changed settings in OXSAS, or the Instrument PC has been replaced).
+* No backup is available (at Customer, nor at Manufacturing), but the instrument is archived in Toucan.
+Post condition
+analytical software is configured as it was when it left Manufacturing
+
+Main Flow
+1. Using Toucan, Service retrieves the instrument from the Archive
+2. Manufacturing restore the instrument in Toucan
+3. Manufacturing perform the use case Setup Analytical software
+4. Manufacturing restore calibrations data from Toucan into Analytical software
+5. Manufacturing perform analytical software backup. 
+6. Service takes the backup to the customer, and restores it there (out-of-scope for Toucan)
+Alternative Flow backup local
+1. If the customer or the manufacturing has the backup, there is no need to retrieve it from the Archive.
+Non-functional
+Traceability: Keeping track of the history of an instrument is important
+Frequency of use
+Very Low	
+Priority
+Very Low
+Origin
+
+Open issues
+
+
+3.10 Use-case CRS_UC_QCOES_001 Perform QC on OES
+Use Case
+CRS_UC_QCOES_001 : Perform QC on OES
+Actors
+Manufacturing
+Goal of Primary Actor
+Ensure that all sensors work (individually)
+Precondition
+Instrument has been built and analytical software has been set up correctly for the QC tests.
+
+Post condition
+Instrument is ready to enter QA
+
+Main Flow
+1. From the Master Knowledge, Toucan creates QC programs (quality) in the Analytical software with default values to perform test: i.e. HVPS, CCD calibration
+2. Toucan provide a checklist of every steps that must be performed. The order of steps in this checklist depends on the components used. OI-0033: more details are needed on the generation of checklist for QC in OES
+3. Manufacturing performs QC tests using provided programs to validate or update instrument parameters; 
+4. Every intermediate QC tests results must be traced until the shipment of the instrument.
+5. Once instrument is shipped, only final QC tests values have to be traced in Toucan.
+Alternative Flow Rare sample
+The QC Plan may be adapted with knowledge from the upcoming QA Plan. Any such change will be traced.
+Alternative Flow EasySpark
+QC for instruments differs depending on components that have to be tested.
+For example QC steps for easySpark CCD and iSpark CCD are different.
+Each instrument can have its own QC plan based on what components compose it
+Alternative Flow QC fails
+1. If QC fails, then the instrument troubleshoot has to be done to identify the problem.
+2. QC step is re-started.
+Non-functional
+QC Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.11 Use-case CRS_UC_QA_001 Perform QA on OES
+Use Case
+CRS_UC_QA_001 : Perform QA on OES
+Actors
+Manufacturing
+Goal of Primary Actor
+Ensure that all sensors and actuators work together and are capable of reaching the intensities required to meet the analytical plan.
+Precondition
+Instrument has passed QC
+
+Post condition
+Instrument is ready to be calibrated
+
+Main Flow
+1. Manufacturing uses Toucan to import in the analytical software the correct analytical program 
+2. Based on Master knowledge and instrument configuration, Toucan creates, in the analytical software, a batch of samples that must be analysed to perform the QA Test
+3. Manufacturing analyses every samples provided by Toucan
+4. Manufacturing makes Toucan to process analysis results to calculate BEC & DL
+5. Toucan compare results from the instrument and required ranges
+6. Toucan stores all analysis- and test-results (matching or not).
+Alternative Flow Out-of-Range
+If the ranges are not met (last step in main flow), then Manufacturing will troubleshoot, fix, and rerun the Main flow. This rerun may only need a few samples to be re-analysed, depending on the lines affected by the fix.
+Non-functional
+QA Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.12 Use-case CRS_UC_QCXRF_001 Perform QC/QA on XRF/XRD
+Use Case
+CRS_UC_QCXRF_001 : Perform QC/QA on XRF/XRD
+Actors
+Manufacturing
+Goal of Primary Actor
+Ensure that all sensors and actuators work (individually)
+Precondition
+Instrument has been built and analytical software has been set up correctly.
+
+Post condition
+Instrument is ready to enter Calibration
+
+Main Flow
+1. Manufacturing instructs Toucan to set up FinalTest.
+2. Manufacturing has to perform tests on the instrument. The results are captured in FinalTest, without Toucan interfering.
+3. Toucan provides, during the SetUp of the analytical software, programs and parameters to perform some steps :
+* Scans provides informations for :
+* Peak position
+* Angular resolution
+* Resolution 
+* Background
+* Intensity
+* Energy profile
+* Dead Time
+* Stability test
+* BEC/DL validation
+4. Results are provided via different XML files (1 per tested line)
+5. Toucan stores all parameters that are outcome of these tests.
+6. Toucan checks all findings against the ranges/limits set in Master Knowledge. These limits are based on statistics from instruments built previously, but are stored (and potentially changed) per instrument.
+Alternative Flow Derogation 
+6. When the check against limits fails, a derogation is used to set new limits/ranges for this particular instrument (such that the value matches); Toucan must store who signed for the derogation, when this was done, what the new range is, and the old one. CR.10 
+Non-functional
+1. XRD process is the same, data is different though OI-0044: In what  sense is XRD different?
+2. In CARL, this checklist is provided via the MethodX program (outside of CARL); OI-0042: we need more details on XRF
+Frequency of use
+High
+Priority
+High 
+Origin
+[Workshop 20191002]
+Open issues
+
+
+3.13 Use-case CRS_UC_CALIB_001 Perform Calibration
+Use Case
+CRS_UC_CALIB_001 : Perform Calibration
+Actors
+* For XRF : Manufacturing
+* For OES: Manufacturing
+Goal of Primary Actor
+Ensure that the instrument is properly calibrated to the Customers needs (as expressed in  the Analytical Plan)
+Precondition
+Instrument has passed QA
+
+Post condition
+Instrument is ready to be validated
+
+Main Flow
+1. Manufacturing uses Master Knowledge to create the Calibration Plan for the instrument (which samples are to be analysed to calibrate the instrument?)
+* Every line needs different samples to get different intensities (representing different concentrations)
+* Up to 100 samples may be needed in this phase (even more)
+2. Toucan creates in the analytical software a batch of analyses to be performed (samples list + analytical method to use + Task)
+3. Once samples analysed Toucan gathers results (no raw data)
+4. Toucan feeds the results through mathematical corrections and then the MVR algorithm to determine the calibration curve.
+5. Toucan sends information (interferences, samples, segments) to analytical software 
+6. The analytical software recalculates every MVR curves using Toucan information.
+7. Manufacturing has to apply line choices in the analytical software.
+Alternative Flow tweak MVR 
+Manufacturing can manually tweak the input to MVR by selecting corrections, dropping outliers, etc.
+Alternative Flow Chameleon
+(note: this is on easySpark only!)
+1. Toucan invokes the Chameleon module to create a smart subset of samples to be measured.
+2. Chameleon sends the batch to analytical software and waits for results
+3. Chameleon interprets the measured spectra, 
+4.  and creates interpolated analyses
+5. Toucan receives the dataset from the Chameleon module, and continues as if this set came from OXSAS.
+Alternative Flow XRF UniQuant
+An XRFs calibration is completely run on the instrument PC in the Analytical SW, but Toucan must receive the resulting parameters for storage and reporting.
+Note that calibration of XFR is optional: the Customer may decide to do calibration by himself.
+Alternative Flow XRF Quantas
+An XRFs calibration is completely run on the instrument PC in the Analytical SW, but Toucan must receive the resulting parameters for storage and reporting.
+Note that calibration of XFR is optional: the Customer may decide to do calibration by himself.
+Alternative Flow XRF MVR
+OI-0045: How is MVR on XRF?
+Non-functional
+This must reuse the DLL that is currently available for performing MVR (see CRS.INT.03)
+Calibration Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.14 Use-case CRS_UC_VALID_001 Perform Validation
+Use Case
+CRS_UC_VALID_001 : Perform Validation
+Actors
+* For XRF : Manufacturing
+* For OES: Manufacturing
+Goal of Primary Actor
+Ensure that the instrument is properly calibrated to the Customers needs (as expressed in the Analytical Plan). Calibration curve coefficient & interferences are validated as well as line choices.
+Precondition
+Instrument is ready to be validated
+
+Post condition
+Instrument Calibration is validated
+Main Flow
+1. Manufacturing uses Master Knowledge to create the Validation Plan for the instrument (which samples are to be analysed to Validate the instrument?)
+2. Toucan creates in the analytical software a batch of analyses to be performed (samples list + analytical method to use + Task)
+3. Once samples analysed Toucan gathers and stores results (no raw data)
+4. Toucan compares results in concentration to samples certificate concentration
+5. Toucan validates that measured concentrations are correct with a tolerance set by element and sample
+6. Toucan create a validation report for instrument.
+Alternative Flow test fails 
+The calibration has to be improved.
+Non-functional
+Validation Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.15 Use-case CRS_UC_REPORT_001 Create reports
+Use Case
+CRS_UC_REPORT_001 : Create reports
+Actors
+Manufacturing
+Goal of Primary Actor
+Create a reports summing up some steps of manufacturing
+Precondition
+Report data are available
+
+Post condition
+Report is created for Instrument 
+Main Flow
+1. Manufacturing goes to Reports section of Toucan
+2. For a given instrument, the current one, Manufacturing chooses one of the report types: 
+* Final report
+* Calibration report
+3. Manufacturing receives a PDF of the chosen report.
+Alternative Flow 
+N/A
+Non-functional
+* (Example reports for /QA/Calibration and Validation are available)
+* Report templates are not edited via a Toucan application, but by hand (and likely need changes in the software as well; these will be change requests then).
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.16 Use-case CRS_UC_ARCH_001 Archive instrument
+Use Case
+CRS_UC_ARCH_001 : Archive (and restore) instrument
+Actors
+Manufacturing (Analytical expert) 
+Goal of Primary Actor
+Have a baseline for later retrieval: how was the instrument delivered to the Customer
+Precondition
+Instrument has been calibrated and validated by an analytical expert from manufacturing.
+
+Post condition
+Instrument Data is stored in the Archive
+Main Flow
+1. Actor instructs Toucan to store the Instrument Data in the Archive:
+* Instrument type and configuration
+* Calibration curves
+* Any other data concerning the instrument.
+Non-functional
+1. The Archive must be available for restoring (see Use-case CRS_UC_RESTORE_001 Recreating analytical software from backup)
+2. If there is a previous version of the instrument data, this must be linked.
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+N/A
+
+3.17 Use-case CRS_UC_UPGR_001 Upgrade instrument
+This is an extension of Use-case CRS_UC_Manufacture_001 Build from Optical Plan OES or Use-case CRS_UC_Manufacture_002 Build from Optical Plan XRF
+Use Case
+CRS_UC_UPGR_001 : Upgrade instrument
+Actors
+Manufacturing
+Goal of Primary Actor
+Ensure that the instrument is upgraded and properly calibrated to the Customers needs (Analytical Plan) means adding analytical lines / Crystal. or option on one existing instrument
+Precondition
+Instrument has been returned for an upgrade
+
+Post condition
+Instrument is ready to be shipped to the Customer
+Main Flow
+1. Manufacturing changes the hardware configuration
+2. (steps as in corresponding Use-cases Manufacture instrument; tests, calibration and validation may be limited to the affected components)
+3. Manufacturing archives the instrument (see Use-case CRS_UC_ARCH_001 Archive instrument), with a link to the previous version of the instrument
+Non-functional
+Traceability: Toucan must be able to find older instances of the same instrument
+Frequency of use
+Low
+Priority
+Low
+Origin
+
+Open issues
+N/A
+
+3.18 Use-case CRS_UC_DEVINSTR_001 Develop new instrument-type
+Use Case
+CRS_UC_DEVINSTR_001 : Develop new instrument type
+Actors
+R&D Analytical specialist
+OES Product manager 
+XRF Product manager 
+NPI Lead
+Goal of Primary Actor
+Create a new type of instrument, with accompanying Master Knowledge
+Precondition
+N/A
+Post condition
+New instrument type available (e.g. using CCD)
+New instrument configuration can be sent to analytical software
+Instrument information can be gathered by Toucan
+New calibration can be developed
+Main Flow
+1. Extend Master Knowledge with new instrument-type and/or types of technology components (such as new detector-type, or new grating, or different dimensions)
+2. Extend Master Knowledge for new instrument-type with a Template Instrument; this is a set of reference Optical Plans that can be tweaked to specific customer needs. This also includes rules for the optical plans (such as which components cannot be combined)
+3. Extend Master Knowledge with input for QC, QA, and calibration (e.g., what samples are needed for specific calibration, what items must go into the QC checklist, etc.).
+Non-functional
+N/A
+Frequency of use
+Low
+Priority
+High
+Origin
+
+Open issues
+
+
+3.19 Use-case CRS_UC_TWCAL_001 Tweak existing calibration
+Use Case
+CRS_UC_TWCAL_001 : Tweak existing calibration
+Actors
+R&D Analytical specialist
+Manufacturing analytical experts
+Goal of Primary Actor
+Update the Master Knowledge to reflect latest insights, correct samples, add curves, add segment, modify interferences, etc.
+Precondition
+Calibration exist in the database.
+Post condition
+Master Knowledge updated.
+Main Flow
+1. Open the existing calibration part of Master Knowledge in Toucan
+2. Actor updates the information
+3. Later, without affecting any running calibrations, the new information is made available to everyone.
+Non-functional
+When updating an existing calibration, or creating a new one, none of the currently running calibrations (by Manufacturing or Analytical specialist) may be impacted!
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+3.20 Use-case CRS_UC_DEVCAL_001 Develop new calibration using MVR Model from nothing
+This use-case is an extension on Use-case CRS_UC_TWCAL_001 Tweak existing calibration.
+
+Use Case
+CRS_UC_DEVCAL_001 : Develop new calibration using MVR model from nothing
+Actors
+R&D Analytical specialist
+XRF Specialist
+Manufacturing Analytical Expert
+Goal of Primary Actor
+Create a new calibration, with accompanying Master Knowledge
+Precondition
+Instrument configuration can be sent to analytical software
+Instrument information can be gathered by Toucan
+Post condition
+New calibration method available in Master knowledge
+Main Flow
+1. Extend Master Knowledge with new calibration 
+2. release calibration for manufacturing
+May need additional data from OXSAS, such as raw measurement data
+Non-functional
+When updating an existing calibration, or creating a new one, none of the currently running calibrations (by Manufacturing or Analytical specialist) may be impacted!
+Required information: results of measurements
+The result of a calibration are stored as different segments/curves.
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+Medium
+Priority
+High
+Origin
+
+Open issues
+
+3.21 Use-case CRS_UC_DEVCAL_002 Develop new calibration using MVR Model from another instrument
+This use-case is an extension on Use-case CRS_UC_TWCAL_001 Tweak existing calibration.
+
+Use Case
+CRS_UC_DEVCAL_002 : Develop new MVR calibration from another instrument
+Actors
+R&D Analytical specialist
+XRF Specialist
+Manufacturing Analytical Expert
+Goal of Primary Actor
+Create a new calibration, with accompanying Master Knowledge
+Precondition
+Instrument configuration can be sent to analytical software
+Instrument information can be gathered by Toucan
+Post condition
+New calibration method available in Master knowledge
+Main Flow
+1. Copy calibration from another instrument to the new one
+2. Extend imported Master Knowledge with  specific data for the new calibration 
+3. release calibration for manufacturing
+May need additional data from OXSAS, such as raw measurement data
+Non-functional
+The imported Master knowledge can come from :
+- same type of instrument but with a small difference (grating)
+- another type of instrument but same optics
+Required information: results of measurements
+The result of a calibration are stored as different segments/curves.
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+3.22 Use-case CRS_UC_DEVCAL_003 Develop new calibration using MVR Model from analytical software
+This use-case is an extension on Use-case CRS_UC_TWCAL_001 Tweak existing calibration.
+
+Use Case
+CRS_UC_DEVCAL_003 : Develop new MVR calibration from analytical software
+Actors
+R&D Analytical specialist
+XRF Specialist
+Manufacturing Analytical Expert
+Goal of Primary Actor
+Create a new calibration, with accompanying Master Knowledge
+Precondition
+Basic Instrument configuration can be sent to analytical software (available analytical lines, source conditions)
+Instrument information can be gathered by Toucan
+Post condition
+New calibration method available in Master knowledge
+Main Flow
+1. Set up analytical software with basic information (already existing analytical lines, source condition)
+2. R&D Analytical specialist create knowledge in the analytical software (analytical lines, source conditions)
+3. R&D analytical expert uses Toucan to import information from Analytical Software to Toucan
+4. R&D analytical expert treats imported data in Toucan to perform the best calibration possible..
+5. R&D analytical expert releases calibration for manufacturing
+May need additional data from OXSAS, such as raw measurement data
+Non-functional
+The imported Master knowledge can come from :
+- Same type of instrument but with a small difference (grating)
+- Another type of instrument but same optics
+Required information: results of measurements
+The result of a calibration are stored as different segments/curves.
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+3.23 Use-case CRS_UC_ANNOUC_001 Create & Display Announcement
+Use Case
+CRS_UC_ANNOUC_001 : Create & Display Announcement
+Actors
+* For XRF : XRF specialist
+* For OES: 
+- Marketing Analytical Specialist
+- R&D Analytical specialist
+* Manufacturing Analytical Expert
+Goal of Primary Actor
+Create an Announcement for manufacturing
+Precondition
+New calibration is available (XRF Specialist or R&D Analytical specialist)
+New LCS release is available (Marketing Analytical specialist)
+Post condition
+Announcement has been read by aimed people
+Main Flow
+1. A new calibration is released or a new LCS release is available
+2. XRF Specialist or R&D Analytical specialist or Marketing Analytical specialist creates an announcement (i.e.  a Rich text document)
+3. The Announcement is sent in Toucan defining :
+- Aimed group of users
+- Announcement duration (period of publication)
+- Content: a title, a text, and optionally a link (e.g. to SharePoint)
+4. When aimed users launch Toucan, they see a notification.
+5. When opening the notification, Toucan records that the specific user has seen the announcements.
+Alternative Flow Users voluntary displays announcement 
+1. The user goes to the Announcements page, and sees all announcements that are 
+* currently within the period of publication (regardless of whether he has already seen it)
+* and targeting the group that the user belongs to.
+Non-functional
+The notification, if applicable, is shown on every screen of the user, until cleared.
+Frequency of use
+Medium to Low
+Priority
+Low
+Origin
+
+Open issues
+
+
+3.24 Use-case CRS_UC_Track_001 Track Master Knowledge changes
+Use Case
+CRS_UC_Track_001 : Track Master Knowledge changes
+Actors
+Every users that changes the Master Knowledge
+Goal of Primary Actor
+Track changes
+Precondition
+Information is available in the master knowledge
+Post condition
+Information has been changed and history is kept
+Main Flow
+1. A user wants to change an information in the master knowledge
+2. User selects the information and changes its value 
+3. On validation of the change a popup windows displays the change(s) and invite the user to explain it
+4. On popup validation, the password of user is asked to make sure of the owner of the modification
+5. The old value is kept in track
+6. The new value is used as new Master Knowledge
+Alternative Flow Modifying set of values  
+1. The user wants to change a set of values
+2. The users starts modifying first value
+3. On validation on first modification, a popup appears and the users select set of values
+4. The popup disappears
+5. Users continues modifying information without popup appearance
+6. New values and old ones are kept in memory
+7. When the users leave the data management screen, a sum up of every modifications is displayed. Every modification is selected
+8. The user unselects unwanted modifications
+9. The user must enter his password to validate selected modifications.
+10. Old values are kept in track
+11. New values are available in master knowledge
+Non-functional
+Rationale for asking the password: Toucan must be certain that the correct user is making the changes
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+
+3.25 Use-case CRS_UC_RELEAS_001 Release of change to Master Knowledge
+Use Case
+CRS_UC_RELEAS_001 : Release of change to master Knowledge
+Actors
+* For XRF : XRF specialist
+* For OES: 
+- Marketing Analytical Specialist
+- R&D Analytical specialist
+- Manufacturing (Analytical Expert)
+Goal of Primary Actor
+Release a change for manufacturing
+Precondition
+A change has to be done in Master knowledge
+Post condition
+The change is available for manufacturing
+Main Flow Standard Changes
+1. A Change has to be performed in the Master Knowledge
+2. User performs the change 
+3. Use-case Track Master Knowledge changes
+4. on validation of the comment, user must define if the change is standard/postponed/Urgent or has to be applied later
+5. User selects Standard.
+6.  The change is released after the Toucan Backup has been performed
+Alternative Flow Urgent change 
+1. A Change has to be performed in the Master Knowledge
+2. R&D Analytical specialist performs the change 
+3. Use-case Track Master Knowledge changes
+4. on validation of the comment, user must define if the change is standard/postponed/Urgent or has to be applied later
+5. User selects Urgent.
+6. The change is immediately done & tracked.
+Alternative Flow Release postponed changes 
+1. A Change has to be performed in the Master Knowledge
+2. User performs the change 
+3. Use-case Track Master Knowledge changes
+4. on validation of the comment, user must define if the change is standard/postponed/Urgent or has to be applied later
+5. User selects postponed.
+6. A window allows the user to link the change to another one; this change will be postponed then as well (as will any change that it is linked to).
+7. The change is recorded & tracked. 
+8. User wants to apply pending changes. This user must have sufficient rights to do so: R&D modification (for quality creation for example) can only be released by a user from R&D
+9. Toucan displays every pending changes
+10. User selects a change and applies it
+11. If change is linked with others, all its children are applied.
+12. Toucan traces who has released the change, and requests a Release Reason.
+Non-functional
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens
+Frequency of use
+Medium to Low
+Priority
+Low
+Origin
+
+Open issues
+
+
+
+3.26 Use-case CRS_UC_Track_002 Get Value history
+Use Case
+CRS_UC_Track_002 : Get Value history
+Actors
+R&D analytical specialist
+Manufacturing (analytical specialist)
+XRF specialist
+Goal of Primary Actor
+Get value history
+Precondition
+Value history exists
+Post condition
+Value history is displayed
+Main Flow
+1. A user wants to check the history of a value in the master knowledge
+2. User opens a dedicated window of Toucan
+3. User selects the kind of information (source condition, analytical lines.) and asks Toucan to display its history
+4. The 10 last values, the modification reason, modification owner, release date, owner of release, comments are displayed 
+5. If the users wants more he performs a specific action (i.e. more values range )
+6. The user closes the window
+Alternative Flow getting a value at a specific moment  
+1. A user wants to check the history of a value in the master knowledge
+2. User opens a dedicated window of Toucan
+3. User selects the kind of information (source condition, analytical lines.) and asks Toucan to display its history
+4. User enters a specific date 
+5. The value used at this time is displayed
+6. The user closes the window
+Non-functional
+
+Frequency of use
+High
+Priority
+High
+Origin
+
+Open issues
+
+3.27 Use-case CRS_UC_SAMPL_001 Sample Management
+Use Case
+CRS_UC_SAMPL_001 : Sample Management
+Actors
+Manufacturing
+R&D Analytical specialist
+Marketing analytical specialist
+Goal of Primary Actor
+Update the Master Knowledge to reflect currently available samples.
+Precondition
+N/A
+Post condition
+Master Knowledge updated.
+Main Flow
+1. Actors opens Sample Management in Toucan
+2. Actor updates the information: adds/updates a sample information.
+3. The new sample is now available for use in calibrations.
+Alternative Flow Replace sample
+When a sample is depleted, it must be replaced.
+1. Actor selects the sample to be replaced for a given quality and instrument type
+2. Toucan stores the new sample (keeping the history) and replacement of each usages of the old sample to the new one in the Master Knowledge must be validated by an analytical specialist.
+Non-functional
+When updating an existing calibration, or creating a new one, none of the currently running calibrations (by Manufacturing or Analytical specialist) may be impacted!
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens. Samples are part of the master knowledge
+Frequency of use
+Medium
+Priority
+High
+Origin
+
+Open issues
+
+
+3.28 Use-case CRS_UC_SOURCE_001 Manage SourceMaster database content
+Use Case
+CRS_UC_SOURCE_001 : Manage SourceMaster database content
+Actors
+R&D Analytical specialist
+OES/XRF Analytical Experts
+Goal of Primary Actor
+Extend the SourceMaster database content with new data
+Precondition
+.
+Post condition
+New data is available for use in other use-cases
+Main Flow
+1. R&D Analytical specialist Manages NIST data lines (see Use-case Manage NIST data Lines)
+2. R&D Analytical specialist Manages analytical assistant
+3. R&D Firmware developer Manages Alarms
+4. R&D Analytical specialist Manages CCD Lines Libraries
+5. R&D Analytical specialist Manages instrument Configurations & Sustaining operations
+6. R&D Analytical specialist Manages Quantas knowledge
+7. R&D Analytical specialist Manages source conditions & Global conditions
+8. R&D Firmware developer Manages status 
+
+Non-functional
+There are no interest in keeping this database the way it is (in CARL).
+Frequency of use
+Medium
+Priority
+High
+Origin
+
+Open issues
+
+3.28.1 Use-case CRS_UC_SOURCE_002 Manage NIST data lines
+Use Case
+CRS_UC_SOURCE_002 : Manage NIST data lines
+Actors
+R&D Analytical specialist
+Goal of Primary Actor
+Extend the SourceMaster database content with new data
+Precondition
+.A new specific line has been identified and validated for a chemical element.
+Post condition
+New line is available for use in other use-cases
+Main Flow
+1. R&D Analytical specialist Identify a new line (wavelength) to detect a specific element
+2. R&D Analytical specialist adds it in the NIST line library to be available for further use.
+Non-functional
+There are no interest in keeping this database the way it is. The NIST analytical lines are filtered by instrument types and detectors.
+Frequency of use
+Low
+Priority
+Low (assuming that all data from CARL is already imported)
+Origin
+
+Open issues
+
+
+3.28.2 Use-case CRS_UC_SOURCE_003 Manage Analytical Assistant
+Use Case
+CRS_UC_SOURCE_003 : Manage Analytical assistant
+Actors
+R&D XRF Analytical specialist
+Goal of Primary Actor
+Extend the SourceMaster database content with new data
+Precondition
+A new type of component has been added in the list of available component (i.e. Crystal).
+A specific line can be added using a specific set of analytical conditions
+Post condition
+New line is available. 
+Main Flow
+1. R&D Analytical specialist Identify a new set of analytical conditions to detect a specific element
+2. R&D Analytical specialist adds it in the Analytical assistant knowledge (including priorities) to be available for further use.
+Non-functional
+There are no interest in keeping this database the way it is.
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+3.28.3 Use-case CRS_UC_SOURCE_004 Manage Alarms
+Use Case
+CRS_UC_SOURCE_004 : Manage Alarms
+Actors
+Firmware developer
+Goal of Primary Actor
+Extend the SourceMaster database content with new data
+Precondition
+A modification in the electronical firmware allows to raise new alarms or modifies its severity.
+Post condition
+New Alarm is available. 
+Main Flow
+1. Firmware developer identifies a new alarm that must been raised by the analytical software.
+2. Firmware developer checks if the alarms already exists
+3. If the alarm exists, the firmware developer can update it
+4. If it does not exist the firmware developer adds it in the knowledge.
+Non-functional
+1. There are no interest in keeping this database the way it is.
+2. Rationale for having Alarms in: Toucan is the only way to configure the Analytical SW, and the available alarms are part of that configuration (determined by the instrument type, no further link to the Master Knowledge)
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+
+3.28.4 Use-case CRS_UC_SOURCE_005 Manage CCD lines libraries
+Use Case
+CRS_UC_SOURCE_005 : Manage CCD Lines libraries
+Actors
+R&D Analytical specialist
+Goal of Primary Actor
+Extend the SourceMaster database content with new data
+Precondition
+A new CCD lines library must be created
+Post condition
+New CCD lines library is added
+Main Flow
+1. R&D Analytical specialist performed analyses in the analytical software to define which CCD lines can be used to perform measurement on a specific matrix
+2. R&D Analytical specialist uses Toucan to export CCD lines from analytical software to Toucan CCD lines Library
+3. Toucan retrieves every CCD lines from the analytical software and creates it in Toucan CCD lines library
+Alternative flow
+The creation of new lines or new libraries shall be possible without analytical software.
+Non-functional
+There are no interest in keeping this database the way it is.
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+3.28.5 Use-case CRS_UC_SOURCE_006 Manage Configurations & Sustaining operations
+Use Case
+CRS_UC_SOURCE_006 : Manage Configurations and sustaining operations
+Actors
+Technical Support Group
+ R&D Analytical specialist
+
+Goal of Primary Actor
+Set up of preventive maintenance information.
+Precondition
+A new calibration has been created using specific components
+Post condition
+New set of values for maintenance of the specific component has been created
+Main Flow
+1. R&D Analytical specialist  has defined new parameters as source conditions, type of component to the TSG
+2. Based on information given by the R&D analytical specialist, TSG defines what correct information have to be set up for preventive sustaining operations.
+3. If the set of information already exists for a specific configuration, the calibration is linked with it
+4. If the set of information does not exists, a new sustaining configuration is created with new set of data. 
+
+Non-functional
+1. Sustaining configuration information contains information like as periodicity in days, number of runs, number of sparks between 2 preventive maintenance to happen, picture displayed to lead user operation for processing the maintenance..
+2. Rationale for having this information in: Toucan is the only way to configure the Analytical SW, and the available maintenance data are part of that configuration (determined by the instrument type, available components, no further link to the Master Knowledge)
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+
+3.28.6 Use-case CRS_UC_SOURCE_007 Manage QUANTAS knowledge
+Use Case
+CRS_UC_SOURCE_007 : Manage QuantAS knowledge
+Actors
+XRF R&D Analytical specialist
+
+Goal of Primary Actor
+Set up knowledge for QuantAS software
+Precondition
+A new QuantAS calibration has been created and must be released for manufacturing
+Post condition
+New QuantAS knowledge is available for production
+Main Flow
+1. XRF R&D Analytical specialist defined in analytical software a new set of parameters to perform QuantAS analyses.
+2. XRF R&D Analytical uses Toucan to export QuantAS information from the analytical software to Toucan knowledge
+3. Every needed information is imported into Toucan and available for manufacturing
+
+Non-functional
+
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+
+3.28.7 Use-case CRS_UC_SOURCE_008 Manage Source Conditions & Global conditions
+Use Case
+CRS_UC_SOURCE_008 : Manage Source Conditions & Global conditions
+Actors
+R&D Analytical specialist
+
+Goal of Primary Actor
+Set up knowledge for Source Conditions and global conditions
+Precondition
+A new set of source conditions and global conditions are available in the analytical software 
+Post condition
+New set of source conditions and global conditions is available for production
+Main Flow
+1. R&D Analytical specialist defined in analytical software a new set of parameters for source conditions and global conditions
+2. R&D Analytical uses Toucan to export source conditions and global conditions information from the analytical software to Toucan knowledge
+3. Every needed information is imported into Toucan and available for manufacturing
+
+Alternative Flow
+The creation of the source conditions and global conditions shall be possible to do manually.
+Non-functional
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens. Source conditions and Global conditions are part of the master knowledge
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+3.28.8 Use-case CRS_UC_SOURCE_009 Manage Status
+Use Case
+CRS_UC_SOURCE_009 : Manage Status
+Actors
+Firmware developer
+Goal of Primary Actor
+Extend the SourceMaster database content with new data
+Precondition
+A modification in the electronical firmware allows to specify new instrument status
+Post condition
+New status is available. 
+Main Flow
+1. Firmware developer identifies a new status that must be managed by the analytical software.
+2. Firmware developer checks if the status already exists
+3. If the status exists, the firmware developer can update it
+4. If it does not exist the firmware developer adds it in the knowledge.
+Non-functional
+1. There are no interest in keeping this database the way it is.
+2. Rationale for having Status in: Toucan is the only way to configure the Analytical SW, and the available status messages are part of that configuration (determined by the instrument type, no further link to the Master Knowledge)
+Frequency of use
+Low
+Priority
+Medium
+Origin
+
+Open issues
+
+
+3.29 Use-case CRS_UC_UNIQUANT_001 Manage UNIQUANT knowledge
+Use Case
+CRS_UC_UNIQUANT_001 : Manage UNIQUANT knowledge
+Actors
+XRF R&D Analytical specialist
+
+Goal of Primary Actor
+Set up knowledge for UNIQUANT software
+Precondition
+A new UNIQUANT calibration has been created and must be released for manufacturing
+Post condition
+New UNIQUANT knowledge is available for production
+Main Flow
+1. XRF R&D Analytical specialist defined in analytical software a new set of parameters to perform UNIQUANT analyses.
+2. XRF R&D Analytical uses Toucan to export UNIQUANT information from the analytical software to Toucan knowledge
+3. Every needed information is imported into Toucan and available for manufacturing
+
+Non-functional
+Master Knowledge is managed by site. Brno knowledge used on an instrument in Brno, Ecublens knowledge used on an instrument in Ecublens. Source conditions and Global conditions are part of the master knowledge
+Frequency of use
+Medium
+Priority
+High
+Origin
+
+Open issues
+
+
+3.30 Use-case CRS_UC_TROUBLE_001 Troubleshooting by statistical data mining
+Use Case
+CRS_UC_TROUBLE_001 : Troubleshooting
+Actors
+Technical Support Group
+R&D Analytical specialist & Manufacturing
+
+
+Goal of Primary Actor
+Find the root cause of the customers complaint (often on stability)
+Precondition
+Service has already tried solving the customers problem, but was not successful, and has escalated the service call to R&D and manufacturing.
+Post condition
+
+Main Flow
+1. Service extracts the relevant data from the customers instrument
+2. R&D Analytical specialist imports this customers data into Toucan AND/OR analytical software
+3. and uses Toucan to quickly check calibration curves and QA Test results when the instrument was shipped 
+4. for deeper investigations analytical software is used
+Non-functional
+When feedback from the field is available (see Use-case CRS_UC_FEEDB_001 Collect feedback from field), this must be part of the data shown as population. Since the same interface will be used for the installed-base, and for instruments in production, a special field should indicate the type of feedback data (manufacturing/field)
+Calibration curves and QA test results are the only data that are currently stored. Can be extended.
+Frequency of use
+Medium
+Priority
+High
+Origin
+
+Open issues
+
+
+3.31 Use-case CRS_UC_FEEDB_001 Collect feedback from field
+Use Case
+CRS_UC_FEEDB_001 : Feedback from field
+Actors
+OES/XRF Analytical specialist
+Goal of Primary Actor
+Get useful information from the installed base, for development of new instruments, calibrations, etc.
+Precondition
+Instrument has been shipped to the Customer, Customer agreed to share information with Thermo Fisher Scientific
+Post condition
+
+Main Flow
+Customers data is sent regularly back to Thermo Fisher Scientific, and automatically imported into the Toucan databases. This information concerns
+* SUS measurement to keep an eye on instrument drift. 
+* Loss of intensities, CCD drift could also be overseen
+Non-functional
+Also requires ANALYTICAL SOFTWARE to be changed
+Frequency of use
+Low	
+Priority
+Low
+Origin
+
+Open issues
+
+
+3.32 Use-case CRS_UC_BACKUP_001 Backup Toucan
+Use Case
+CRS_UC_BACKUP_001 : Backup Toucan
+Actors
+IT Department
+Goal of Primary Actor
+Have regular backups of Toucan to ensure that Manufacturing can continue, and that no vital data is lost when something happens to the server Toucan is running on
+Precondition
+-
+Post condition
+A backup has been created
+Main Flow
+1. IT department creates a daily offsite backup of the data in Toucan, automatically
+Non-functional
+1. There are no additional requirements on backup.
+2. A backup must trigger the release of postponed changes (of type Standard Changes, see Use-case CRS_UC_RELEAS_001 Release of change to Master Knowledge).
+Frequency of use
+High (daily)
+Priority
+High
+Origin
+
+Open issues
+
+
+
+
+
+4 FUNCTIONAL AND NON-FUNCTIONAL REQUIREMENTS
+4.1 Additional functional requirements
+Req. Id.
+Requirement description
+Origin
+CRS.TRACE.01
+The following operations on the data must be traced to who made the update. Every modification must contain:
+* A reason for the modification
+* The owner of the modification
+Rationale: the Master Knowledge is vital to Thermo Fisher Scientific.
+
+CRS.TRACE.02
+The trace must be stored in the Toucan database; there is no need to cryptographically ensure that this trace cannot be modified (i.e., non-repudiation)
+
+
+Additional traceability requirements are found in 
+* Use-case CRS_UC_UPGR_001 Upgrade instrument : trace history of an instrument
+* Use-case CRS_UC_Track_001 Track Master Knowledge changes
+* Use-case CRS_UC_Track_002 Get Value history
+
+Req. Id.
+Requirement description
+Origin
+CRS.LOGIC.01
+Business logic in Toucan is the same as in CARL: when calibrating in either application, the resulting calibration curve is the same (when same settings are applied)
+Rationale: the Master Knowledge is vital to Thermo Fisher Scientific
+
+
+Req. Id.
+Requirement description
+Origin
+CRS.CCD.01
+Toucan must handle both PMT and CCD in OES
+Rationale: a separate code-base for either variant is not maintainable.
+
+
+4.2 System performance
+
+Req. Id.
+Requirement description
+Origin
+CRS.PERF.01
+Multi-site usage of Toucan for calibration must have the same performance on all sites.
+
+CRS.PERF.02
+Toucan must be able to run self-hosted.
+
+CRS.PERF.03
+Toucan must be able to hold at least twice the amount of data that CARL currently holds. 
+Rationale: the body of data will continue to grow with new instruments being built (~1k/yr) and Master Knowledge. Any limit here must be checked.
+
+
+4.3 Installation and upgrading
+
+Req. Id.
+Requirement Description
+Origin
+CRS.INST.01
+All relevant (i.e. consistent) information available in CARL must be available in Toucan.
+Rationale: no data loss except for data that is already inconsistent in CARL.
+
+CRS.INST.02
+Toucan must be usable from the Instrument PC for the setup of Analytical SW. The Instrument PC is a Windows 10 machine 
+
+CRS.INST.03
+In the future, the instrument PC may be a Linux-machine.
+
+CRS.INST.04
+The LCS must be usable outside of Thermo Fisher Scientific, by Sales Representatives who are not employees of Thermo Fisher Scientific. These users will use the Windows platform.
+
+
+After installation, Toucan will be regularly upgraded:
+
+Req. Id.
+Requirement Description
+Origin
+CRS.UPGR.01
+Any change to the Master Knowledge must be explicitly released by  before it is visible to others. 
+
+CRS.UPGR.02
+When a new version of Toucan is rolled out, any application that is part of Toucan must either
+* be upgraded automatically,
+* or inform the user that a newer version is available, with clear instructions on how to obtain that version.
+
+
+
+4.4 Service 
+
+Req. Id.
+Requirement Description
+Origin
+CRS.SERV.01
+Toucan must give meaningful feedback on its state, if that is of fixable nature to the Service department (i.e. information on integrity of database, connection problems, etc.)
+
+CRS.SERV.02
+Toucan can be monitored to make sure it is operational
+
+4.5 Availability and recoverability
+Req. Id.
+Requirement Description
+Origin
+CRS.AVAIL.01
+Toucan must be available to Manufacturing (including calibration) 95% of production hours in timezone of operating site (e.g., Swiss or Czech).
+
+CRS.AVAIL.02
+Toucan must be available to R&D Analytical specialist 95% of office hours in timezone of operating site (e.g., Swiss or Czech).
+
+Recoverability: see Use-case CRS_UC_BACKUP_001 Backup Toucan
+
+Upgradeability: see 
+
+4.6 Safety 
+N/A, there are no safety-critical parts in the system.
+4.7 Security
+
+Req. Id.
+Requirement Description
+Origin
+CRS.AUTH.01
+Toucan must have authentication of users, coupled to LDAP
+
+CRS.AUTH.02
+Users must be assigned specific roles; every role determines what data is visible and/or changeable. (At least) following roles are needed:
+* USERS : can only perform automated actions
+* ANALYTICAL_EXPERTS: can modify data
+* ADMINISTRATORS: can modify group rights
+* SALES_NONTFS: sales representatives outside Thermo Fisher Scientific (have limited view on available knowledge)
+* SALES: sales representatives inside TFS.
+
+CRS.XS.01
+Data from the Master Knowledge may never be available stored on the Instrument PC, or otherwise be accessible from outside Thermo Fisher Scientific (see also Use-case CRS_UC_Manufacture_001 Build from Optical Plan OES)
+
+4.8 Extensibility
+As captured in
+* Use-case CRS_UC_DEVINSTR_001 Develop new instrument-type
+* Use-case CRS_UC_DEVCAL_001 Develop new calibration using MVR Model from nothing
+
+Out-of-scope for this document, but likely to be added are:
+* Support for XRD systems,
+* Support for UniQuant.
+* Automation of calibration.
+
+In order to meet all these extensions,
+Req. Id.
+Requirement Description
+Origin
+  CRS.EXT.01
+Toucan must have a modular, extendable architecture.
+
+
+4.9 Usability Requirements
+There is no need to keep the color schemes of CARL, but following requirements do hold:
+
+Req. Id.
+Requirement Description
+Origin
+  CRS.UX.01
+Toucan must follow standard Windows controls (i.e. users are not surprised by the reaction on a mouse-click or keypress)
+
+CRS.UX.02
+Toucan should follow the UX-guidelines from Thermo Fisher Scientific, as laid out in [TFS_UX]
+
+
+4.10 External Interfaces
+
+Req. Id.
+Requirement Description
+Origin
+  CRS.INT.01
+Toucan must interface with ANALYTICAL SOFTWARE as-is now:
+* Setup instrument data
+* Retrieve analysis data
+
+CRS.INT.02
+Toucan must setup IOP-Procs as-is now (part of previous requirement)
+
+CRS.INT.03
+Toucan must reuse the MVR.DLL as-is. If any modification is needed, this will be done by Thermo Fisher Scientific.
+Rationale: this very same DLL is also deployed on the Analytical SW.
+
+
+4.11 Implementation technologies
+Req. Id.
+Requirement Description
+Origin
+CRS.IMP.01
+Toucan should preferably use a Microsoft technology stack: .Net Core/C#, MSSQL Server
+
+CRS.IMP.02
+Toucan should be prepared for deployment on AWS (self-hosted)
+
+CRS.IMP.03
+Parts of Toucan that run on the Instrument PC should be prepared for deployment on Linux: see CRS.INST.02 and CRS.INST.03 in Installation.
+
+
+5 
+CHANGE REQUESTS
+Following list the Change Requests on top of the CRS as offered to ThermoFisher ([CRS v14]); requirements can refer to these by their ID.
+
+ID
+Description
+Origin
+CR.01
+Support FinalTest: export to FinalTest
+
+CR.02
+Trace usage of Toucan:
+* Continue where the instrument was left (in the workflow)
+* ?
+
+CR.03
+Provide online help/manual
+
+CR.04
+Log into the ELK stack
+[JF 20190904_Sky]
+CR.05
+Import from FinalTest for reporting
+
+CR.06
+Different types of components & curves
+
+CR.07
+XRF QC/QA runs on Toucan: calculations and store result. This includes the UniQuant- and Quantas-calibrations.
+Note: this removes the ValidationTool from the XRF-workflow
+[Workshop 20191002]
+CR.08
+XRF calibration runs on Toucan: calculations and store result. This includes the UniQuant- and Quantas-calibrations.j
+Note: this removes the ValidationTool from the XRF-workflow
+[Workshop 20191002]
+CR.09
+Strong QC is a step in the workflow of XRF. StrongQC checks all lines, before shipment to Ecublens.
+[Workshop 20191002]
+CR.10
+XRF must have support for storing derogation for XRF
+[Workshop 20191002]
+CR.11
+Migrate Brno-specific data directly into Toucan, not via CARL. 
+Rationale: CARL is not location-aware, so this new data may interfere with data that is already existent.
+[Workshop 20191002]
+CR.12
+Toucan must give an indication how long it will take for an instrument to be built & calibrated (based on information in QAD)
+[Workshop 20191002]
+CR.13
+Toucan must be able to handle network (Brno  Ecublens) failure
+[Workshop 20191002]
+CR.14
+Automatically retrieve results from Analytical SW and compute results from it. 
+Rationale: let this run overnight, unsupervised.
+[Workshop 20191002]
+CR.15
+Support NSR both in Ecublens and Brno.
+Note: it is currently unclear how they are treated in both sites.
+[Workshop 20191002]
+CR.16
+During InitialSetup, information must be shown on Extensions (related to Master Knowledge and CATSS)
+SwRS review d.d. Oct 10 19
+CR.17
+During QC, Analytical Software must receive HVPS qualities
+SwRS review d.d. Oct 10 19
+CR.18
+While building the instrument, it must be possible to add (and use) a new optical line without having to reset all of Analytical SW (and redo all of QC/QA/Calibration)
+SwRS review d.d. Oct 10 19
+CR.19
+When the SRT is updated, before the instrument is started in Toucan, Toucan must be updated (in CARL-Toucan hybrid)
+SwRS review d.d. Oct 23 19
+CR.20
+Delta on Reporting for EasySpark
+Oct 22 19 input
+CR.21
+Have the possibility to clone an instrument with its full state. Rationale: for research/troubleshooting without changing the original instrument
+SwRS review d.d. Oct 23 19
+CR.22
+Toucan must use a converter to send the PDF-certificates of selected samples to Analytical SW. These certificates are hosted on a separate server, but Toucan knows which samples are to be used (and for which certificates the customer has paid)
+[VCO 20191025]
+CR.23
+Merge EasySpark and iSpark reports into one (CARL has two different formats)
+[VCO 20191025]
+CR.24
+Support an instrument being shipped from Brno to Ecublens halfway during the manufacturing flow (OES: after QC, XR: after some calibration)
+[ManFlow]
+CR.25
+Integration of Chameleon: how to share knowledge with Chameleon? This might introduce a new converter.
+
+CR.26
+Add the notion of Configuration to both MasterKnowledge and InstrumentKnowledge
+
+CR.27
+Move FinalTest setup from QC to before InitialSetup
+
+
+
+
+
+6 DOCUMENT INFO
+6.1 Terms and Abbreviations
+List of specific terms and abbreviations used in this document; for the general terms and abbreviation used within Toucan, see [Glossary].
+
+Term
+Description
+CRS
+Customer Requirement Specifications
+
+
+will
+Customer requirement
+should
+Recommendation by customer or executives
+could
+Accepted by customer or regulations
+must
+Prescribed by legislation or regulatory
+
+6.2 References
+Ref. #
+Document Title
+Doc. ID.
+[Glossary]
+Toucan Glossary and Domain Knowledge
+TOUCAN-GLOS-06
+[Representatives]
+Toucan Representatives
+TOUCAN-Representatives
+[TFS_UX]
+User Interface (UI) Elements
+TFS_UX
+[UC-Overview]
+Toucan CRS UseCase Overview
+TOUCAN-CRSUC-10
+
+
+
+
+
+
+
+6.3 Document Version History
+Version
+Date
+[dd Mmm yyyy]
+Author
+[First Last Name]
+Description of changes 
+Change ID
+
+1
+May 22, 2019
+Laurens Vrijnsen
+Initial version
+
+2
+May 23, 2019
+Laurens Vrijnsen
+Review comments internal review incorporated
+
+3
+May 24, 2019
+Laurens Vrijnsen
+Review comments internal review incorporated
+
+4
+May 24, 2019
+Laurens Vrijnsen
+Review comments internal review incorporated
+
+5
+May 28, 2019
+Laurens Vrijnsen
+Preliminary feedback from Vincent + Sandra: renaming OXSAS, using proper definitions
+
+6
+June 6, 2019
+Laurens Vrijnsen, Vincent Colombani
+Feedback from TFS incorporated
+
+7
+June 6, 2019
+Laurens Vrijnsen, Vincent Colombani
+Additional input from Vincent after review
+
+8
+June 11, 2019
+Vincent Colombani
+Additional Input + merge with Laurens Vrijnsen document
+
+9
+June 11, 2019
+Vincent Colombani
+Insertion of last remark
+Finalisation of document
+
+10
+June 13, 2019
+Laurens Vrijnsen
+Review comments
+
+11
+June 24, 2019
+Laurens Vrijnsen
+Incorporate feedback internal reviews (PaZe): detailing use-cases, upgrading requirements, 
+Added use-cases from Vincent
+
+12
+July 2, 2019
+Laurens Vrijnsen
+Open issues answered by Vincent
+
+13
+July 5, 2019
+Laurens Vrijnsen
+Review comments from Thermo Fisher Scientific review incorporated.
+
+14
+July 30, 2019
+Vincent Colombani
+Addition of Brno Comments & Uniquant UC
+
+15
+December 3, 2019
+Laurens Vrijnsen
+Updated for XRF Initial Setup, QC/QA, Validation, Reporting, Archiving
+
+
+
+
+
+
+
+
+
+
+
+Customer Requirements Specification
+Toucan
+Doc ID
+Doc Date
+Doc Version
+Doc Status
+:
+:
+:
+:
+TOUCAN-CRS
+Dec 3, 2019
+15
+Proposal
+
+
+
+
+
+Page 1
+
+
+
+page 1 of 41
+
+
+
+
+
+
+
+
+
+

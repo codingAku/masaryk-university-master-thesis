@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import base64
 from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
@@ -13,24 +14,71 @@ import db_helpers
 # -----------------------------
 # 3. Helper Functions for Chat
 # -----------------------------
-system_message = SystemMessagePromptTemplate.from_template(
-    "You are {persona_name} {persona_last_name}, an employee with the job title: {persona_job}. Your native language is {native_language} and your english proficiency is {english_level}. Respond concisely like a human. Pay attention to your native language and english level, and make your answers in english like a human with the given english proficieny. Do not make the user understand you are AI. If you are prompted a question out of your specialty, reply confused. Do not generate emotions or gestures in parantheses, just write the reply."
-)
+def initialize_persona_session():
+    """
+    Initializes the session for the selected persona by creating a detailed system prompt.
+    The prompt includes persona details (name, job title, native language, English level) and
+    transcript excerpts for context.
+    """
+    persona = st.session_state["persona"]
+    transcripts = persona.get("transcripts", [])
+    transcripts_text = "\n".join([
+            t.get("file_content", b"").decode("utf-8", errors="ignore") if isinstance(t.get("file_content", b""), bytes)
+            else t.get("file_content", str(t))
+            for t in transcripts
+        ]) if transcripts else "No transcripts available."
+    
+    stakeholder_info = load_system_prompts_from_directory("stakeholder-info")
+    
+    system_prompt = (
+        f"You are {persona.get('first_name', 'User')} {persona.get('last_name', 'User')}, an employee with the job title: {persona.get('job_title', 'N/A')}. You may look in this prompt for your job description. "
+        "You work at Thermo Fisher Scientific. You are stakeholder to an application named Toucan, used for manufacturing of optical emission and xr spectrometers. You will talk requirement elicitation with your software developer co-worker in this session."
+        f"Your native language is {persona.get('native_language', 'English')}, but the conversations will be in English. and your English proficiency is {persona.get('english_level', 'C1')}."
+        "Therefore your english level will be crucial in the conversation. Respond in the given level."
+        "Respond concisely like a human. Do not include your thought process, just return the answer you give to the user. Do not explain your thought flow as an AI model, only return in the prompt the answer during conversation. Pay attention to your native language and English level, and craft your replies accordingly. "
+        "Do not reveal that you are AI. If asked about topics outside your area of expertise, reply with confusion."
+        "Avoid generating emotions or gestures in parentheses; simply provide your reply.\n\n"
+        "The following transcript excerpts from previous meetings provide additional context for your persona. In the transcript, look for the answers of the person you are by name. You must pay attention to the information and also the way of speaking for the person, you can use information in the transcipts and answer like the persona:\n"
+        f"{transcripts_text}\n\n"
+        "You can observe how the human you impersonate talks in the transcript by looking at sentences with your persona name. And then you can reply similar to how that person does."
+        "Please use this context along with any previous conversation history to ensure your responses remain consistent with your persona."
+        # "Here are some domain information for you to use:"
+        # f"{stakeholder_info}"
+    )
+    
+    # Store the full system prompt in the session state
+    st.session_state["persona_system_prompt"] = system_prompt
+
+def load_system_prompts_from_directory(directory_path):
+    """
+    Reads all text files in the given directory and concatenates their contents as the system prompt.
+    """
+    system_prompts = []
+    for filename in os.listdir(directory_path):
+        file_path = os.path.join(directory_path, filename)
+        if os.path.isfile(file_path) and filename.endswith(".txt"):
+            with open(file_path, "r", encoding="utf-8") as file:
+                system_prompts.append(file.read())
+    
+    return "\n\n".join(system_prompts)
+        
+
+
 
 def build_prompt_messages():
-    persona_name = st.session_state["persona"].get("first_name", "User")
-    persona_last_name = st.session_state["persona"].get("last_name", "User")
-    persona_job = st.session_state["persona"].get("job_title", "N/A")
-    native_language = st.session_state["persona"].get("native_language", "English")
-    english_level = st.session_state["persona"].get("english_level", "C1")
-    sys_msg = system_message.format(
-        persona_name=persona_name,
-        persona_job=persona_job,
-        persona_last_name=persona_last_name,
-        native_language=native_language,
-        english_level=english_level
-    )
-    prompt_msgs = [sys_msg]
+    """
+    Builds the chat prompt messages by starting with the persona-specific system prompt (if available)
+    and then appending the chat history. This ensures the model uses the persona context and transcripts.
+    """
+    # Use the persona-specific system prompt if available; otherwise, fall back to the default system message.
+    if "persona_system_prompt" in st.session_state and st.session_state["persona_system_prompt"]:
+        
+        sys_msg_template = SystemMessagePromptTemplate.from_template(
+            st.session_state["persona_system_prompt"]
+        )
+    prompt_msgs = [sys_msg_template]
+    
+    # Append the conversation history (chat_history) to maintain context.
     for entry in st.session_state["chat_history"]:
         prompt_msgs.append(HumanMessagePromptTemplate.from_template(entry["user"]))
         prompt_msgs.append(AIMessagePromptTemplate.from_template(entry["assistant"]))
