@@ -1,6 +1,13 @@
 import nltk
 from nltk.tokenize import sent_tokenize
-nltk.download('punkt')
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    nltk.download('punkt_tab')
 
 def chunk_text(text, max_tokens=18, tokenizer=None):
     """

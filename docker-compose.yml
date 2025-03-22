@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: dockerfile
+    network_mode: "slirp4netns"
     ports:
       - "8501:8501"      # Streamlit app port
       - "11434:11434"    # Ollama API port
@@ -24,6 +25,7 @@ services:
 
   db:
     image: postgres:13
+    network_mode: "slirp4netns"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
