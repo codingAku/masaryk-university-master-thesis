@@ -179,7 +179,7 @@ def send_to_tts(text_chunk, user_audio_file):
     """
     url = "http://localhost:58004/tts"
     # Prepare the payload with text.
-    data = {"text": text_chunk,  "speaker_ref_path": "assets/ondrej_60.mp3"}
+    data = {"text": text_chunk,  "speaker_ref_path": f"assets/{st.session_state["persona"]["first_name"]}.mp3"}
     # files = None
     # # If a user audio file is provided, send it as 'audiodata'
     # if user_audio_file:
