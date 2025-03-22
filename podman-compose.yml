@@ -1,66 +1,39 @@
-version: "3.5"
-
-volumes:
-  hf-cache:
-    driver: local
-    driver_opts:
-      type: none
-      device: /var/tmp/xklimes5/es_thesis/storage/hf-cache
-      o: bind
-
-x-common-settings: &common-settings
-  deploy:
-    replicas: 1
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: 1
-            capabilities: [ gpu ]
-  ipc: host
-  tty: true
-  build:
-    context: .
-  image: metavoice-server:latest
-  network_mode: slirp4netns:allow_host_loopback=true
-  environment:
-    - NVIDIA_VISIBLE_DEVICES=all
-    - HF_HOME=/.hf-cache
-  logging:
-    options:
-      max-size: "100m"
-      max-file: "10"
+version: "3.8"
 
 services:
-  server:
-    <<: *common-settings
-    container_name: metavoice-server
-    command: [ "--port=58004" ]
-    devices:
-      - nvidia.com/gpu=1
+  app:
+    build:
+      context: .
+      dockerfile: dockerfile
+    network_mode: slirp4netns:allow_host_loopback=true
     ports:
-      - 58004:58004
+      - "8501:8501"      # Streamlit app port
+      - "11434:11434"    # Ollama API port
     volumes:
-      - /var/tmp/xklimes5/es_thesis/storage/hf-cache:/.hf-cache:Z
-      - ./assets:/app/assets:Z
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:58004/health" ]
-      interval: 1m
-      timeout: 10s
-      retries: 20
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@10.0.2.2:5432/mydb
+    depends_on:
+      - db
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
-  ui:
-    <<: *common-settings
-    container_name: metavoice-ui
-    entrypoint: [ "poetry", "run", "python", "app.py" ]
+  db:
+    image: postgres:13
+    network_mode: slirp4netns:allow_host_loopback=true
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
-      - 7861:7861
-    volumes:
-      - /var/tmp/xklimes5/es_thesis/storage/hf-cache:/.hf-cache:Z
-      - ./assets:/app/assets:Z
-    healthcheck:
-      test: [ "CMD", "curl", "http://localhost:7861" ]
-      interval: 1m
-      timeout: 10s
-      retries: 1
+      - "5432:5432"
 
+volumes:
+  pgdata:
