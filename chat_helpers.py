@@ -26,7 +26,8 @@ def setup_rag_index():
         "stakeholder-info/Toucan-GLOS.txt",
         "stakeholder-info/Full-MVR.txt",
         "stakeholder-info/manufacturing-flow.txt",
-        "stakeholder-info/MVR-rules-revision.txt"
+        "stakeholder-info/MVR-rules-revision.txt",
+        "stakeholder-info/job-description.txt"
     ]
     
     if "rag_index" not in st.session_state:
@@ -41,7 +42,6 @@ def setup_rag_index():
 def initialize_persona_session():
     """
     Initializes the session for the selected persona by creating a detailed system prompt.
-    The prompt includes persona details and transcript excerpts for context.
     """
     persona = st.session_state["persona"]
     transcripts = persona.get("transcripts", [])
@@ -77,7 +77,6 @@ def build_prompt_messages():
     )
     prompt_msgs = [sys_msg_template]
     
-    # Append conversation history for context.
     for entry in st.session_state["chat_history"]:
         prompt_msgs.append(HumanMessagePromptTemplate.from_template(entry["user"]))
         prompt_msgs.append(AIMessagePromptTemplate.from_template(entry["assistant"]))
@@ -87,7 +86,7 @@ def generate_response(user_text):
     # Ensure the RAG index is set up.
     setup_rag_index()
     
-    # Retrieve domain context using the RAG indexer based on the user query.
+    # Retrieve domain context using the RAG indexer.
     domain_context = retrieve_context(
         user_text,
         st.session_state["rag_documents"],
@@ -101,7 +100,7 @@ def generate_response(user_text):
         f"Use the following domain context to help answer the query:\n\n{domain_context}"
     )
     
-    # Build the prompt messages: start with domain context, then persona prompt and chat history.
+    # Build the prompt messages.
     persona_sys_prompt = SystemMessagePromptTemplate.from_template(
         st.session_state["persona_system_prompt"]
     )
