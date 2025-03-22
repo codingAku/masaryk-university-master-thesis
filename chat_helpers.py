@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 import base64
+import requests
 from langchain_ollama import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import (
@@ -13,6 +14,9 @@ import db_helpers
 
 # Import our indexer functions from indexer.py
 from indexer import initialize_indexer, retrieve_context
+
+# NEW IMPORT: Import tokenizer's chunk_text method.
+from tokenizer import chunk_text
 
 # -----------------------------
 # 1. Initialize Domain Indexer
@@ -129,6 +133,22 @@ def process_message(user_text):
     db_helpers.add_chat_message(person_id, "user", user_text)
     db_helpers.add_chat_message(person_id, "assistant", response_text)
     st.session_state["chat_history"] = db_helpers.get_chat_history(person_id)
+    
+    # --- Voice Generation Integration ---
+    # Only proceed if voice generation is enabled and the selected model is not deepseek.
+    if st.session_state.get("enable_voice_generation") and "deepseek-r1" not in st.session_state.get("selected_model", "").lower():
+        # Tokenize the generated response text.
+        chunks = chunk_text(response_text)
+        audio_chunks = []
+        # Retrieve user's sound file if available; assume the first audio file.
+        user_audio_file = None
+        if st.session_state["persona"].get("audios"):
+            user_audio_file = st.session_state["persona"]["audios"][0].get("file_content")
+        for chunk in chunks:
+            # Send TTS request to metavoice TTS service with chunk text and user_audio_file.
+            audio_data = send_to_tts(chunk, user_audio_file)
+            audio_chunks.append(audio_data)
+        play_audio_sequence(audio_chunks)
 
 def on_text_submit():
     user_text = st.session_state.get("user_input")
@@ -143,6 +163,70 @@ def delete_chat():
 
 def update_model():
     st.session_state["model"] = ChatOllama(model=st.session_state["selected_model"])
+    # If a deepseek model is selected, ensure voice generation is disabled.
+    if "deepseek-r1" in st.session_state["selected_model"].lower():
+        st.session_state["enable_voice_generation"] = False
 
 def image_to_base64(image_bytes):
     return f"data:image/png;base64,{base64.b64encode(image_bytes).decode()}"
+
+# --- New Helper Functions for Voice TTS Integration ---
+
+def send_to_tts(text_chunk, user_audio_file):
+    """
+    Sends a TTS request to the metavoice TTS service using the provided text chunk
+    and the user's audio file (if available). Returns the audio data (wav file bytes).
+    """
+    url = "http://localhost:58004/tts"
+    # Prepare the payload with text.
+    data = {"text": text_chunk,  "speaker_ref_path": "assets/ondrej_60.mp3"}
+    # files = None
+    # # If a user audio file is provided, send it as 'audiodata'
+    # if user_audio_file:
+    #     files = {
+    #         "speaker_ref_path": ("assets/slyvain.mp3")
+    #     }
+    try:
+        response = requests.post(url, data=data)
+        response.raise_for_status()
+        return response.content  # This is the wav file bytes.
+    except Exception as e:
+        st.error(f"TTS request failed: {e}")
+        return None
+
+def play_audio_sequence(audio_chunks):
+    """
+    Plays the provided audio chunks sequentially in the browser using injected JavaScript.
+    The audio chunks are base64 encoded and chained for sequential playback.
+    """
+    # Filter out any None values.
+    valid_chunks = [chunk for chunk in audio_chunks if chunk]
+    if not valid_chunks:
+        return
+
+    # Convert each audio chunk to a base64 data URL.
+    audio_data_urls = []
+    for chunk in valid_chunks:
+        b64_audio = base64.b64encode(chunk).decode()
+        data_url = f"data:audio/wav;base64,{b64_audio}"
+        audio_data_urls.append(data_url)
+
+    # Build a JavaScript snippet that plays the audio URLs sequentially.
+    js_code = f"""
+    <script>
+    const audioUrls = {audio_data_urls};
+    let current = 0;
+    const audioPlayer = new Audio();
+    audioPlayer.src = audioUrls[current];
+    audioPlayer.play();
+    audioPlayer.addEventListener('ended', () => {{
+        current++;
+        if (current < audioUrls.length) {{
+            audioPlayer.src = audioUrls[current];
+            audioPlayer.play();
+        }}
+    }});
+    </script>
+    """
+    # Inject the JavaScript into the Streamlit app.
+    st.components.v1.html(js_code, height=0, width=0)

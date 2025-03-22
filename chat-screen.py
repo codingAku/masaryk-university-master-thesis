@@ -75,6 +75,9 @@ if "user_choice" not in st.session_state:
     st.session_state["user_choice"] = "-- Select a User --"
 if "update_mode" not in st.session_state:
     st.session_state["update_mode"] = False
+# Initialize voice generation flag if not set.
+if "enable_voice_generation" not in st.session_state:
+    st.session_state["enable_voice_generation"] = False
 
 # -----------------------------
 # 5. UI Layout
@@ -283,12 +286,18 @@ with left_col:
             st.button("Update User", on_click=update_user)
 
 with right_col:
+    # Show a warning and disable voice generation if a deepseek model is selected.
     if "deepseek-r1" in st.session_state.get("selected_model", ""):
         st.warning(
             "Warning, this model uses Chain of Thought process. "
             "If you would like to see how the model uses domain knowledge and user instructions to generate a response, use this model. "
             "Voice mode is disabled in this model."
         )
+        st.checkbox("Enable Voice Generation", key="enable_voice_generation", value=False, disabled=True)
+    # Global voice generation checkbox; disable if deepseek is selected.
+    else:
+        st.checkbox("Enable Voice Generation", key="enable_voice_generation")
+        
     st.selectbox(
         "Select Model:",
         options=get_available_models(),
