@@ -1,0 +1,62 @@
+Here's the document rewritten in text format with each job description as a bullet list:
+
+# Job Roles Description
+
+## Assembler
+* Build instrument
+* Does not do any analytical measurement
+* Toucan roles: Operator
+
+## Profiler
+* Specific job role for OES instrument
+* Profiler builds internal optics of iSpark
+* Toucan roles: Operator, Profiler
+
+## Manufacturing Technician
+* Is responsible for QC/QA test during manufacturing
+* Operates with Toucan manufacturing environment and OXSAS on daily basis
+* Does not require access to MK
+* Toucan roles: Operator, Manufacturing engineer, Analytical expert
+* Note: Toucan roles must be updated
+
+## Analytical Expert
+* Is responsible for managing manufacturing qualities and samples
+* Troubleshoot and accepts NOK and OK with Warnings curves in QA and Calibrations
+* Manage statistics and update limits in MK
+* Uses elevated screens in manufacturing (Full MVR)
+* Responsible for derogations of analytical results based on customer use cases
+* On XR also responsible for creation of Monochromator list for 9900
+* Toucan roles: Operator, Manufacturing engineer, Analytical expert
+
+## Calibrator
+* Responsible for instrument calibration - MVR, UniQuant, QuantAs
+* Toucan roles: Operator, Manufacturing engineer, Analytical expert
+* Note: Toucan roles must be updated
+
+## Operation Engineer
+* Support for manufacturing team
+* Troubleshoot HW, analytical and software issues
+* Uses Manufacturing, Statistics and MK parts of Toucan
+* Is responsible for managing HW parts and QC stuff in MK
+* Toucan roles: Operator, Manufacturing engineer, Analytical expert
+* Note: Toucan roles must be updated
+
+## Sample Manager
+* Responsible for replacing of obsolete samples
+* Also create samples for XR manufacturing (mixing them in laboratory)
+* Toucan roles: Operator, Manufacturing engineer, Analytical expert
+
+## Application Specialist
+* Create new analytical applications for our instruments
+* Uses elevated screens in manufacturing (Full MVR) to create new qualities and MK
+* Toucan roles: Operator, Analytical expert, Analytical specialist
+
+## Sales Representative
+* Manages discussion with our customers about their use case and proposed configuration
+* Works in Define instrument (internal) or external LCS (contractors)
+* Toucan roles: Sales engineer
+
+## Marketing Specialist
+* Responsible for check of instrument defined by sales
+* Responsible for NSR management - both analytical and HW
+* Toucan roles: Sales admin, Marketing analytical specialist
