@@ -2,11 +2,11 @@ Ticket number: TOUC-2435
 
 I discovered again something that is not correct in FULL MVR screen.
 
-I built a new curve from FULL MVR screen on instrument 8860-CVU_9958774, 
+I built a new curve from FULL MVR screen on instrument number 9958774, 
 I chose quality FELASTB, Component Si04_8, interferences Cr and Cu, both are additive interference. 
 my test was good with interferences, but the graph was bad, the points did not align, the graph doesn't seem to have good fit. It should be between the data points, but it does not fit well.
 
-Then I did the same operation on instrument 8860-9958774T (it is a copy of  instrument CVU_9958774). This time, I saved the curve even though it is graphically bad. Then I re-computed the saved segment, I got exactly the same curve coefficients, the same interferences coefficients than instrument CVU_9958774, but the curve graph now is correct, it fitted well with the data points.
+Then I did the same operation on instrument type 8860, and number 9958774T (it is a copy of  instrument CVU_9958774). This time, I saved the curve even though it is graphically bad. Then I re-computed the saved segment, I got exactly the same curve coefficients, the same interferences coefficients than instrument CVU_9958774, but the curve graph now is correct, it fitted well with the data points.
 
 Why do we have the different curves?
 

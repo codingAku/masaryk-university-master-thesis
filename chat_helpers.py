@@ -24,13 +24,27 @@ URL = "http://host.docker.internal:58004/tts"
 def get_cached_index():
     domain_files = [
         "stakeholder-info/Toucan-Glossary.txt",
-        f"stakeholder-info/Full-MVR-{st.session_state["persona"]["first_name"]}.txt",
-        f"stakeholder-info/Manufacturing-Flow-{st.session_state["persona"]["first_name"]}.txt",
-        f"stakeholder-info/MVR-Curve-Rules-{st.session_state["persona"]["first_name"]}.txt",
+        f"stakeholder-info/Full-MVR-{st.session_state['persona']['first_name']}.txt",
+        f"stakeholder-info/Manufacturing-Flow-{st.session_state['persona']['first_name']}.txt",
+        f"stakeholder-info/MVR-Curve-Rules-{st.session_state['persona']['first_name']}.txt",
         "stakeholder-info/Role-Descriptions.txt",
         "stakeholder-info/Toucan-Description.txt",
     ]
+    
+    # Add transcript paths
+    transcripts = st.session_state["persona"].get("transcripts", [])
+    for idx, transcript in enumerate(transcripts):
+        file_path = f"/tmp/transcript_{idx}.txt"
+        if isinstance(transcript.get("file_content", b""), bytes):
+            with open(file_path, "wb") as f:
+                f.write(transcript["file_content"])
+        else:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(transcript["file_content"])
+        domain_files.append(file_path)
+
     return initialize_indexer(domain_files)
+
 
 def setup_rag_index():
     if "rag_index" not in st.session_state:
@@ -68,8 +82,7 @@ def initialize_persona_session():
         "Therefore your english level will be crucial in the conversation. Respond in the given level. If your english level is relatively low, you can use some words in your native language from time to time."
         "Respond concisely like a human. Do not generate emotions or reactions in parantheses, just generate the human answer. Do not include your thought process, just return the answer you give to the user. Do not explain your thought flow as an AI model, only return in the prompt the answer during conversation. Pay attention to your native language and English level, and craft your replies accordingly. "
         "Do not reveal that you are AI. If asked about topics outside your area of expertise, reply with confusion. Be a bit aggresive against code questions."
-        "The following transcript excerpts from previous meetings provide additional context for your persona. In the transcript, look for the answers of the person you are by name. You must pay attention to the information and also the way of speaking for the person, you can use the information in the transcripts and answer like the persona:\n"
-        f"{transcripts_text}\n\n"
+        "There are transcripts in domain context where you can find stakeholder style of talking. Mimic it. previous meetings provide additional context for your persona. In the transcript, look for the answers of the person you are by name. You must pay attention to the information and also the way of speaking for the person, you can use the information in the transcripts and answer like the persona"
         "You can observe how the human you impersonate talks in the transcript by looking at sentences with your persona name. And then you can reply similar to how that person does. "
         "Please use this context along with any previous conversation history to ensure your responses remain consistent with your persona."
     )
