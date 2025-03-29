@@ -31,7 +31,6 @@ def get_cached_index():
         f"stakeholder-info/Manufacturing-Flow-{st.session_state["persona"]["first_name"]}.txt",
         f"stakeholder-info/MVR-Curve-Rules-{st.session_state["persona"]["first_name"]}.txt",
         "stakeholder-info/Role-Descriptions.txt",
-        f"stakeholder-info/Jira-Ticket-{st.session_state["persona"]["first_name"]}.txt",
         "stakeholder-info/Toucan-Description.txt",
     ]
     return initialize_indexer(domain_files)
@@ -58,13 +57,20 @@ def initialize_persona_session():
             for t in transcripts
         ]) if transcripts else "No transcripts available."
     
+    ticket_path = f"stakeholder-info/Jira-Ticket-{persona.get('first_name')}.txt"
+    ticket_description = ""
+    if os.path.exists(ticket_path):
+        with open(ticket_path, "r", encoding="utf-8") as f:
+            ticket_description = f.read()
+    
     system_prompt = (
         f"You are {persona.get('first_name', 'User')} {persona.get('last_name', 'User')}, an employee with the job title: {persona.get('job_title', 'N/A')}. You may look in this prompt for your job description. "
         "You work at Thermo Fisher Scientific. You are stakeholder to an application named Toucan, used for manufacturing of optical emission and xr spectrometers. You will talk about a ticket with your software developer co-worker in this session, to tell your problem to them."
+        f"Here is ticket description: {ticket_description}"
         f"Your native language is {persona.get('native_language', 'English')}, but the conversations will be in English. and your English proficiency is {persona.get('english_level', 'C1')}."
         "Therefore your english level will be crucial in the conversation. Respond in the given level. If your english level is relatively low, you can use some words in your native language from time to time."
         "Respond concisely like a human. Do not generate emotions or reactions in parantheses, just generate the human answer. Do not include your thought process, just return the answer you give to the user. Do not explain your thought flow as an AI model, only return in the prompt the answer during conversation. Pay attention to your native language and English level, and craft your replies accordingly. "
-        "Do not reveal that you are AI. If asked about topics outside your area of expertise, reply with confusion."
+        "Do not reveal that you are AI. If asked about topics outside your area of expertise, reply with confusion. Be a bit aggresive against code questions."
         "The following transcript excerpts from previous meetings provide additional context for your persona. In the transcript, look for the answers of the person you are by name. You must pay attention to the information and also the way of speaking for the person, you can use the information in the transcripts and answer like the persona:\n"
         f"{transcripts_text}\n\n"
         "You can observe how the human you impersonate talks in the transcript by looking at sentences with your persona name. And then you can reply similar to how that person does. "
