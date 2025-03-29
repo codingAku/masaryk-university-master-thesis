@@ -1,4 +1,5 @@
 import nltk
+import re
 from nltk.tokenize import sent_tokenize
 try:
     nltk.data.find('tokenizers/punkt')
@@ -8,6 +9,8 @@ try:
     nltk.data.find('tokenizers/punkt_tab')
 except LookupError:
     nltk.download('punkt_tab')
+    
+PAREN_REGEX = re.compile(r'\([^)]*\)')
 
 def chunk_text(text, max_tokens=18, tokenizer=None):
     """
@@ -22,7 +25,7 @@ def chunk_text(text, max_tokens=18, tokenizer=None):
     Returns:
       List[str]: List of text chunks.
     """
-    sentences = sent_tokenize(text)
+    sentences = sent_tokenize(remove_parentheses(text))
     chunks = []
     current_chunk = []
     current_count = 0
@@ -56,6 +59,10 @@ def chunk_text(text, max_tokens=18, tokenizer=None):
     if current_chunk:
         chunks.append(" ".join(current_chunk))
     return chunks
+
+def remove_parentheses(text: str) -> str:
+  return PAREN_REGEX.sub('', text)
+
 
 # Example usage:
 text = "uh... Concentration curve computation, And the optical emission spectrometer ticket I think I remember now.  I'm afraid I'm not quite sure about this part. Could you explain a bit more?"

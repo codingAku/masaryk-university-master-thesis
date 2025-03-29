@@ -13,8 +13,8 @@ nce you are in the compute screen, the first selection you can do is select a qu
 Toucan application is mainly developed in Brno. The development team members are:
 - Filip Antol - Project Manager
 - Ondrej Hrabina - Product Owner
-- Vadim Anisimov - Staff Engineer
-- Ecenur Sezer - Software Engineer (Main MVR developer)
+- Vadim Anisimov - Staff Engineer (Main NSR developer)
+- Ecenur Sezer - Software Engineer (Main MVR and NSR developer)
 - Josef Behal - Software Engineer (Mainly works with XR part of Toucan)
 - Vincent Colombani - Domain Expert (speaks French)
 - Jean Michel Ginier - Domain Expert (speaks French)

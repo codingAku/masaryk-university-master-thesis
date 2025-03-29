@@ -1,0 +1,65 @@
+version: "3.5"
+
+volumes:
+  hf-cache:
+    driver: local
+    driver_opts:
+      type: none
+      device: /var/tmp/xsezer/storage/hf-cache
+      o: bind
+
+x-common-settings: &common-settings
+  deploy:
+    replicas: 1
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [ gpu ]
+  ipc: host
+  tty: true
+  build:
+    context: .
+  image: metavoice-server:latest
+  network_mode: slirp4netns:allow_host_loopback=true
+  environment:
+    - NVIDIA_VISIBLE_DEVICES=all
+    - HF_HOME=/.hf-cache
+  logging:
+    options:
+      max-size: "100m"
+      max-file: "10"
+
+services:
+  server:
+    <<: *common-settings
+    container_name: metavoice-server
+    command: [ "--port=58004" ]
+    devices:
+      - nvidia.com/gpu=1
+    ports:
+      - 58004:58004
+    volumes:
+      - /var/tmp/xsezer/storage/hf-cache:/.hf-cache:Z
+      - ./assets:/app/assets:Z
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:58004/health" ]
+      interval: 1m
+      timeout: 10s
+      retries: 20
+
+  ui:
+    <<: *common-settings
+    container_name: metavoice-ui
+    entrypoint: [ "poetry", "run", "python", "app.py" ]
+    ports:
+      - 7861:7861
+    volumes:
+      - /var/tmp/xsezer/storage/hf-cache:/.hf-cache:Z
+      - ./assets:/app/assets:Z
+    healthcheck:
+      test: [ "CMD", "curl", "http://localhost:7861" ]
+      interval: 1m
+      timeout: 10s
+      retries: 1

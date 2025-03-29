@@ -1,0 +1,60 @@
+MVR Rules Revision
+
+This document captures the updates needed for MVR rules in Toucan. It shows the check curve properties, and when they should have which status.
+
+Detailed Rules:
+
+ADDITIVE INTERFERENCE
+Display name: +Itf.
+Checked parameter: K0ITF > 0
+Provided description: Additive interferences should be negative
+
+CONCAVITY
+Display name: Concavity
+Checked parameter: bad_concavity
+Provided description: Curve must be concave upward due to saturation effect. Intensity tends toward an asymptote while concentration increases.
+
+INFLECTION
+Display name: Inflection
+Checked parameter: accepted_with_inflection
+Provided description: Inflection point in the low concentration area.
+
+Checked parameter: refused_for_inflection
+Provided description: Inflection point in the domain. The position of the inflection point can trigger an error if above the segmentation point or use a threshold (%Cmax) to differentiate between acceptance and refusal.
+
+MULTIPLICATION INTERFERENCE
+Display name: *itf.
+Checked parameter: NONE
+Provided description: Strong multiplicative interference causes convergence issues. Current implementation uses a threshold of +/- 500.
+
+R2
+Display name: R2
+Checked parameter: NONE
+Provided description: NONE
+
+ROOT
+Checked parameters:
+- no_root: Curve does not intersect with intensity axis.
+- root_out: Curve intersects intensity axis outside the maximum range.
+- positive_intercept: Curve has a positive intercept with the concentration axis.
+- wrong_extremum: Curve has a problematic extremum (2nd or 3rd degree) inside the range of interest.
+
+SEE
+Display name: SEE
+Checked parameter: NONE
+Provided description: NONE
+
+SLOPE
+Display name: Slope
+Checked parameter: negative_slope
+Provided description: Curve has a negative slope.
+
+Segment statuses (Segment1_QA, Segment1_Calibration, Segment2_Calibration):
+- Toucan Status: NotOK, OkWithWarnings, Ok, NONE
+- Default Accepted Flag: FALSE, TRUE, NONE
+- Approval Rights: Analytical Expert, Analytical Specialist, Manufacturing Engineer, NONE
+
+Remarks:
+- Multiplication interference threshold (+/- 500) confirmed implemented.
+- Inflexion changes should trigger recomputation of segments.
+

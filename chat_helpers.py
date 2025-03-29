@@ -26,13 +26,13 @@ URL = "http://host.docker.internal:58004/tts"
 @st.cache_resource
 def get_cached_index():
     domain_files = [
-        "stakeholder-info/Toucan-GLOS.txt",
-        "stakeholder-info/Full-MVR.txt",
-        "stakeholder-info/manufacturing-flow.txt",
-        "stakeholder-info/MVR-rules-revision.txt",
-        "stakeholder-info/job-description.txt",
-        "stakeholder-info/ticket-description.txt",
-        "stakeholder-info/toucan-description.txt",
+        "stakeholder-info/Toucan-Glossary.txt",
+        f"stakeholder-info/Full-MVR-{st.session_state["persona"]["first_name"]}.txt",
+        f"stakeholder-info/Manufacturing-Flow-{st.session_state["persona"]["first_name"]}.txt",
+        f"stakeholder-info/MVR-Curve-Rules-{st.session_state["persona"]["first_name"]}.txt",
+        "stakeholder-info/Role-Descriptions.txt",
+        f"stakeholder-info/Jira-Ticket-{st.session_state["persona"]["first_name"]}.txt",
+        "stakeholder-info/Toucan-Description.txt",
     ]
     return initialize_indexer(domain_files)
 

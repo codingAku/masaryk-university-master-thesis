@@ -1,4 +1,5 @@
-Ticket-description: When MVR DLL issue an error Toucan only gives an error and does not display details.
+Ticket-description: When there is any error about curve coefficients, Toucan does not display the warning and only gives one error, and aborts the MVR calculation.
+Ticket number: TOUC-1445
 Expected: the end user shall receive feedback what warning was issued by the MVR DLL instead of one error.
 
 DLL Rules:
@@ -18,9 +19,9 @@ Use case 1: if n < k:
 
 error “UndeterminedSystem”
 
-red flag in the “Compute” screen, for QA and for Calibration
+There should be red flag for the curve status in the “Compute” screen, for QA and for Calibration.
 
-request an analytical specialist
+ an analytical specialist can accept the curve.
 
 Use case 2: if n <= k*1.5 (for OES):
 
