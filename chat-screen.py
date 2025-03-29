@@ -1,28 +1,13 @@
-import io
 import streamlit as st
-import subprocess
 import base64
-from PIL import Image
 from langchain_ollama import ChatOllama
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import (
-    SystemMessagePromptTemplate,
-    HumanMessagePromptTemplate,
-    AIMessagePromptTemplate,
-    ChatPromptTemplate,
-)
 from streamlit_chat import message
-from streamlit.components.v1 import html
 
 # Import our database helper functions from db.py
-import db_helpers
 
 # Import helper modules
 from model_helpers import get_available_models
 from chat_helpers import (
-    build_prompt_messages,
-    generate_response,
-    process_message,
     on_text_submit,
     delete_chat,
     update_model,
