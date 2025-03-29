@@ -20,4 +20,4 @@ COPY . .
 
 EXPOSE 8501 11434
 
-CMD ollama serve & streamlit run chat-screen.py --server.port=8501 --server.address=0.0.0.0
+CMD ollama serve & streamlit run chat-screen.py --server.port=8501 --server.address=0.0.0.0 --server.fileWatcherType none
