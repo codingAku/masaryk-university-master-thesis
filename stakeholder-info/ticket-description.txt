@@ -1,0 +1,53 @@
+Ticket-description: When MVR DLL issue an error Toucan only gives an error and does not display details.
+Expected: the end user shall receive feedback what warning was issued by the MVR DLL instead of one error.
+
+DLL Rules:
+
+n = number of samples
+k = number of parameters (coefficients to fit)
+low_limit (for OES) = 2
+very_low_limit (OES) = 1.5
+
+Rerquested Error messages in Toucan:
+k > 2 … no error message
+1.5 < k < 2 … low number of samples
+1 < k < 1.5 … very low number of samples
+k < 1 … not enough samples to fit
+
+Use case 1: if n < k:
+
+error “UndeterminedSystem”
+
+red flag in the “Compute” screen, for QA and for Calibration
+
+request an analytical specialist
+
+Use case 2: if n <= k*1.5 (for OES):
+
+warning “very low number of samples”
+
+if possible, add a column in the “Check curve” table, for “NbSample”, and add a red cross here.
+
+Red flag in the “Compute” screen for QA, may be accepted by an analytical expert (to ensure info is given to specialists, to maybe review the curve)
+
+Red flag in the “Compute” screen for Calibration, require an analytical specialist to accept
+
+Use case 3: if n <= k*2 (for OES):
+
+warning “low number of samples”
+
+Green flag in the “Compute” screen for QA, otherwise too many curves will have warning (the goal in QA is to select samples well aligned, but to keep the total number of samples as low as possible for this test)
+
+Orange flag in the “Compute” screen for Calibration, require an manufacturing engineer to accept
+
+How to test:
+The only way to play with curves, number of samples and interferences (to add coefficients) is to work with the Full interface. You have to select any instrument, at least with a QA test. 
+
+Then, select the QA quality in the Full MVR screen. You can chose the first line of the list in "Lines/components" table. Do not select the curve (n°1, or 2), but build yourself a curve with only 2 samples for instance: if you sort the concentrations by increasing order (see column "Conc" in the table named "Samples", you can select the lowest point and the highest one (by checking in the cases before the sample names). Then, with 2 samples selected, go in the screen "Interferences" (see the different available screens in the top of your screen, on the right side of "OES" blue cell. So, in the screen "Interferences", click on the button "Compute", located on the bottom part of the screen. You should obtain a straight line (so degree 1), with only 2 samples. It means you have 2 coefficients (a, b) and 2 samples, a warning should be provided.
+
+ To add another coefficient (to have 3 coefficients), you can select a "Base curve degree" = 2, or add an additive interference.
+
+ What I see now: I can add interferences in a curve degree 1, with only 2 points, which should not be accepted without clear warning. I see a "Not OK" in the "Computation" status, but reason is not very clear. And this "Not OK" is not in red, so not easy to see. But if I select the degree 2, for the same curve, I have an error message (popup = Error calculating MVR"), and TOUCAN exits me from the screen and cancel my selection.
+
+ DoD:
+- propagation of DLL error to Toucan frontend

@@ -80,6 +80,7 @@ ME:See Calculation Steps
 MRE:See Calculation Steps
 MSSQL:A database management system from Microsoft.
 MVR:Multi-Variate Regression; algorithm to find the calibration coefficients.
+MVR DLL: A library used by Toucan to calculate MVR. Maintained by Lucas Guillaume.
 N1:See Calculation Steps
 NIST:National Institute of Standards and Technology.
 Non-repudiation:A proof that the data has not been changed after its first creation.

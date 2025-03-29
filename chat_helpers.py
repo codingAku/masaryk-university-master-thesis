@@ -1,3 +1,4 @@
+from threading import Thread
 import streamlit as st
 import os
 import base64
@@ -21,21 +22,22 @@ from tokenizer import chunk_text
 # -----------------------------
 # 1. Initialize Domain Indexer
 # -----------------------------
-def setup_rag_index():
-    """
-    Sets up the RAG indexer by reading domain files and saving
-    the documents, FAISS index, and embedding model in st.session_state.
-    """
+@st.cache_resource
+def get_cached_index():
     domain_files = [
         "stakeholder-info/Toucan-GLOS.txt",
         "stakeholder-info/Full-MVR.txt",
         "stakeholder-info/manufacturing-flow.txt",
         "stakeholder-info/MVR-rules-revision.txt",
-        "stakeholder-info/job-description.txt"
+        "stakeholder-info/job-description.txt",
+        "stakeholder-info/ticket-description.txt",
+        "stakeholder-info/toucan-description.txt",
     ]
-    
+    return initialize_indexer(domain_files)
+
+def setup_rag_index():
     if "rag_index" not in st.session_state:
-        documents, index, embedding_model = initialize_indexer(domain_files)
+        documents, index, embedding_model = get_cached_index()
         st.session_state["rag_documents"] = documents
         st.session_state["rag_index"] = index
         st.session_state["rag_embedding_model"] = embedding_model
@@ -57,12 +59,11 @@ def initialize_persona_session():
     
     system_prompt = (
         f"You are {persona.get('first_name', 'User')} {persona.get('last_name', 'User')}, an employee with the job title: {persona.get('job_title', 'N/A')}. You may look in this prompt for your job description. "
-        "You work at Thermo Fisher Scientific. You are stakeholder to an application named Toucan, used for manufacturing of optical emission and xr spectrometers. You will talk requirement elicitation with your software developer co-worker in this session."
+        "You work at Thermo Fisher Scientific. You are stakeholder to an application named Toucan, used for manufacturing of optical emission and xr spectrometers. You will talk about a ticket with your software developer co-worker in this session, to tell your problem to them."
         f"Your native language is {persona.get('native_language', 'English')}, but the conversations will be in English. and your English proficiency is {persona.get('english_level', 'C1')}."
         "Therefore your english level will be crucial in the conversation. Respond in the given level. If your english level is relatively low, you can use some words in your native language from time to time."
-        "Respond concisely like a human. Do not generate emotions or reactions, just generate the human answer. Do not include your thought process, just return the answer you give to the user. Do not explain your thought flow as an AI model, only return in the prompt the answer during conversation. Pay attention to your native language and English level, and craft your replies accordingly. "
+        "Respond concisely like a human. Do not generate emotions or reactions in parantheses, just generate the human answer. Do not include your thought process, just return the answer you give to the user. Do not explain your thought flow as an AI model, only return in the prompt the answer during conversation. Pay attention to your native language and English level, and craft your replies accordingly. "
         "Do not reveal that you are AI. If asked about topics outside your area of expertise, reply with confusion."
-        "Avoid generating emotions or gestures in parentheses; simply provide your reply.\n\n"
         "The following transcript excerpts from previous meetings provide additional context for your persona. In the transcript, look for the answers of the person you are by name. You must pay attention to the information and also the way of speaking for the person, you can use the information in the transcripts and answer like the persona:\n"
         f"{transcripts_text}\n\n"
         "You can observe how the human you impersonate talks in the transcript by looking at sentences with your persona name. And then you can reply similar to how that person does. "
@@ -137,18 +138,15 @@ def process_message(user_text):
     # --- Voice Generation Integration ---
     # Only proceed if voice generation is enabled and the selected model is not deepseek.
     if st.session_state.get("enable_voice_generation") and "deepseek-r1" not in st.session_state.get("selected_model", "").lower():
-        # Tokenize the generated response text.
-        chunks = chunk_text(response_text)
-        audio_chunks = []
-        # Retrieve user's sound file if available; assume the first audio file.
-        user_audio_file = None
-        if st.session_state["persona"].get("audios"):
-            user_audio_file = st.session_state["persona"]["audios"][0].get("file_content")
-        for chunk in chunks:
-            # Send TTS request to metavoice TTS service with chunk text and user_audio_file.
-            audio_data = send_to_tts(chunk, user_audio_file)
-            audio_chunks.append(audio_data)
-        play_audio_sequence(audio_chunks)
+        Thread(target=generate_and_play_audio, args=(response_text,)).start()
+
+def generate_and_play_audio(response_text):
+    chunks = chunk_text(response_text)
+    user_audio_file = None
+    if st.session_state["persona"].get("audios"):
+        user_audio_file = st.session_state["persona"]["audios"][0].get("file_content")
+    audio_chunks = [send_to_tts(chunk, user_audio_file) for chunk in chunks]
+    play_audio_sequence(audio_chunks)
 
 def on_text_submit():
     user_text = st.session_state.get("user_input")

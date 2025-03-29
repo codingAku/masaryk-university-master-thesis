@@ -141,15 +141,15 @@ with left_col:
             ),
         )
 
-        form.text_area(
-            "Personality Traits:",
-            key="personality_traits",
-            value=(
-                st.session_state.get("persona", {}).get("personality_traits", "")
-                if st.session_state.get("update_mode", False)
-                else ""
-            ),
-        )
+        # form.text_area(
+        #     "Personality Traits:",
+        #     key="personality_traits",
+        #     value=(
+        #         st.session_state.get("persona", {}).get("personality_traits", "")
+        #         if st.session_state.get("update_mode", False)
+        #         else ""
+        #     ),
+        # )
 
         # Existing file_uploader for new photo
         form.file_uploader(
@@ -190,7 +190,17 @@ with left_col:
             "Upload Audio File:",
             key="audio_files",
             type=["wav", "mp3"],
+            disabled=True,
             accept_multiple_files=False,  # only one audio file allowed
+        )
+        
+        form.markdown(
+            """
+            <div style="background-color:#fff3cd; color:black; padding:8px; border-left:5px solid #ffa502; border-radius:6px; margin-bottom:10px;">
+                🚧 <strong>Audio Upload</strong> – This section is under construction.
+            </div>
+            """,
+            unsafe_allow_html=True
         )
         
         # If an existing audio file is in persona, display it and provide a checkbox to remove it
@@ -297,6 +307,9 @@ with right_col:
     # Global voice generation checkbox; disable if deepseek is selected.
     else:
         st.checkbox("Enable Voice Generation", key="enable_voice_generation")
+        
+    if st.session_state.get("enable_voice_generation", False):
+        st.warning("⚠️ Experimental feature enabled. It may take longer to produce responses.")
         
     st.selectbox(
         "Select Model:",

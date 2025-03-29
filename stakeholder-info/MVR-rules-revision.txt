@@ -1,6 +1,6 @@
 MVR Rules Revision
 
-This document captures the updates needed for MVR rules in Toucan.
+This document captures the updates needed for MVR rules in Toucan. It shows the check curve properties, and when they should have which status.
 
 Detailed Rules:
 
