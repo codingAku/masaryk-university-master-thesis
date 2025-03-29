@@ -13,11 +13,8 @@ from langchain_core.prompts import (
 )
 import db_helpers
 
-# Import our indexer functions from indexer.py
 from indexer import initialize_indexer, retrieve_context
-
-# NEW IMPORT: Import tokenizer's chunk_text method.
-from tokenizer import chunk_text
+from tokenizer import chunk_text, remove_parentheses
 
 URL = "http://host.docker.internal:58004/tts"
 # -----------------------------
@@ -136,7 +133,7 @@ def process_message(user_text):
     if not st.session_state["persona"].get("id"):
         st.warning("No user selected. Please add or select a user.")
         return
-    response_text = generate_response(user_text)
+    response_text = remove_parentheses(generate_response(user_text))
     person_id = st.session_state["persona"]["id"]
     db_helpers.add_chat_message(person_id, "user", user_text)
     db_helpers.add_chat_message(person_id, "assistant", response_text)
