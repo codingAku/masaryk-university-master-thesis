@@ -1,6 +1,6 @@
 Ticket-description: When there is any error about curve coefficients, Toucan does not display the warning and only gives one error, and aborts the MVR calculation.
 Ticket number: TOUC-1445
-Expected: the end user shall receive feedback what warning was issued by the MVR DLL instead of one error.
+Expected: I should receive feedback what warning was issued by the MVR DLL instead of one error, for example, I should see “UndeterminedSystem”
 
 DLL Rules:
 
