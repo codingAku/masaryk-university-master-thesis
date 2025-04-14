@@ -4,7 +4,8 @@ Master's thesis research for Masaryk University, 2024. Mainly aiming for the dev
 # Stakebot 
 
 There is a chat application built with Streamlit that integrates with ChatOllama (via LangChain) and provides a modern chat UI. It includes features such as model selection via a dropdown, user profile management, and dynamic chat history clearing.
-![image](https://github.com/user-attachments/assets/6b85f18a-8daf-404f-9bc3-9aa1fe0f4537)
+
+![image](https://github.com/user-attachments/assets/87b5dc2f-d2bd-4ace-9e71-92b7bb150cdd)
 
 
 ## Features
