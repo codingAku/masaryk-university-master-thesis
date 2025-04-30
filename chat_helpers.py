@@ -30,18 +30,6 @@ def get_cached_index():
         "stakeholder-info/Role-Descriptions.txt",
         "stakeholder-info/Toucan-Description.txt",
     ]
-    
-    # Add transcript paths
-    transcripts = st.session_state["persona"].get("transcripts", [])
-    for idx, transcript in enumerate(transcripts):
-        file_path = f"/tmp/transcript_{idx}.txt"
-        if isinstance(transcript.get("file_content", b""), bytes):
-            with open(file_path, "wb") as f:
-                f.write(transcript["file_content"])
-        else:
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(transcript["file_content"])
-        domain_files.append(file_path)
 
     return initialize_indexer(domain_files)
 
@@ -88,20 +76,6 @@ def initialize_persona_session():
     
     st.session_state["persona_system_prompt"] = system_prompt
 
-def build_prompt_messages():
-    """
-    Builds the chat prompt messages by starting with the persona-specific system prompt
-    and then appending the chat history to maintain context.
-    """
-    sys_msg_template = SystemMessagePromptTemplate.from_template(
-        st.session_state["persona_system_prompt"]
-    )
-    prompt_msgs = [sys_msg_template]
-    
-    for entry in st.session_state["chat_history"]:
-        prompt_msgs.append(HumanMessagePromptTemplate.from_template(entry["user"]))
-        prompt_msgs.append(AIMessagePromptTemplate.from_template(entry["assistant"]))
-    return ChatPromptTemplate.from_messages(prompt_msgs)
 
 def generate_response(user_text):
     # Ensure the RAG index is set up.
