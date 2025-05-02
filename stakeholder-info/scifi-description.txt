@@ -1,0 +1,11 @@
+SciFi is a real-time control application that automates the mechanical “foot” of modular laboratory spectrometers. By coordinating sensors, motion hardware, and safety interlocks, SciFi enables a single software command to:
+
+Disengage the currently mounted spectrometer from its cradle.
+
+Park & lock the mechanical foot in a safe, load-free position.
+
+Receive a replacement spectrometer and secure it to operational tolerances.
+
+Verify alignment and readiness before releasing the instrument to the lab’s LIMS / data-acquisition pipeline.
+
+The result is tool-free, contamination-free change-over in under two minutes, with full traceability

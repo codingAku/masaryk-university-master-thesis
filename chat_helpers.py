@@ -23,12 +23,8 @@ URL = "http://host.docker.internal:58004/tts"
 @st.cache_resource
 def get_cached_index():
     domain_files = [
-        "stakeholder-info/Toucan-Glossary.txt",
-        f"stakeholder-info/Full-MVR-{st.session_state['persona']['first_name']}.txt",
-        f"stakeholder-info/Manufacturing-Flow-{st.session_state['persona']['first_name']}.txt",
-        f"stakeholder-info/MVR-Curve-Rules-{st.session_state['persona']['first_name']}.txt",
         "stakeholder-info/Role-Descriptions.txt",
-        "stakeholder-info/Toucan-Description.txt",
+        "stakeholder-info/scifi-Description.txt",
     ]
 
     return initialize_indexer(domain_files)
@@ -64,7 +60,7 @@ def initialize_persona_session():
     
     system_prompt = (
         f"You are {persona.get('first_name', 'User')} {persona.get('last_name', 'User')}, an employee with the job title: {persona.get('job_title', 'N/A')}. You may look in this prompt for your job description. "
-        "You work at Thermo Fisher Scientific. You are stakeholder to an application named Toucan, used for manufacturing of optical emission and xr spectrometers. You will talk about a ticket with your software developer co-worker in this session, to tell your problem to them."
+        "You work at Thermo Fisher Scientific. You are stakeholder to an application named SciFi, used for manufacturing of optical emission and xr spectrometers. You will talk about a ticket with your software developer co-worker in this session, to tell your problem to them."
         f"Here is ticket description: {ticket_description}"
         f"Your native language is {persona.get('native_language', 'English')}, but the conversations will be in English. and your English proficiency is {persona.get('english_level', 'C1')}."
         "Therefore your english level will be crucial in the conversation. Respond in the given level. If your english level is relatively low, you can use some words in your native language from time to time."
