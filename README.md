@@ -62,7 +62,14 @@ Assuming you are still in masaryk-university-master-thesis directory, clone the 
 copy "docker-compose.yml" "<your-metavoice-src-cloned-repo"
  ```
 
-Navigate to metavoice-src repository and run the metavoice container:
+Navigate to metavoice-src repository and add voice sample file with <Username.mp4> filename:
+```bash
+cd <your-metavoice-src-cloned-repo>/assets
+ls
+|_ <Username.mp4>
+```
+
+Run the container:
 ```bash
 cd <your-metavoice-src-cloned-repo>
 docker-compose build
@@ -129,6 +136,13 @@ URL: "http://10.0.2.2:58004/tts"
 Run the main containers again:
 ```bash
 podman-compose up
+```
+
+Navigate to metavoice-src repository and add voice sample file with <Username.mp4> filename:
+```bash
+cd <your-metavoice-src-cloned-repo>/assets
+ls
+|_ <Username.mp4>
 ```
 
 Run metavoice container:
