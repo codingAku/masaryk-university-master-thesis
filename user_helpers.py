@@ -1,3 +1,7 @@
+# Copyright (c) 2025, Ecenur Sezer
+# Licensed under the BSD 3-Clause License
+# See the LICENSE file in the project root for full license text.
+
 import streamlit as st
 import chat_helpers
 import db_helpers

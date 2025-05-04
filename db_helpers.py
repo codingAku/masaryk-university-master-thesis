@@ -1,3 +1,7 @@
+# Copyright (c) 2025, Ecenur Sezer
+# Licensed under the BSD 3-Clause License
+# See the LICENSE file in the project root for full license text.
+
 import os
 from sqlalchemy import create_engine, Column, Integer, String, LargeBinary, Text, ForeignKey, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base

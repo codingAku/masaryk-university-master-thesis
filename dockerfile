@@ -1,3 +1,7 @@
+# Copyright (c) 2025, Ecenur Sezer
+# Licensed under the BSD 3-Clause License
+# See the LICENSE file in the project root for full license text.
+
 FROM python:3.13.2-slim
 
 RUN apt-get update && apt-get install -y \
